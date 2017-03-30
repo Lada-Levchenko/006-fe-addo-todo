@@ -11,6 +11,15 @@
 }
 
 #main_area{
+  padding-top: 20px;
   background-color: #fff;
   min-height: 100vh;
+}
+
+.adding-button{
+  color: #f00;
+}
+
+.deactive{
+  display: none !important;
 }

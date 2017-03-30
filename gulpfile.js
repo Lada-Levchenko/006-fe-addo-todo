@@ -15,7 +15,7 @@ var path = {
   },
   src: {
     style: 'src/style/main.scss',
-    js: 'src/js/appreact.js'
+    js: 'src/js/menureact.js'
   },
   clean: './build'
 };
@@ -34,7 +34,7 @@ gulp.task('js:build', function() {
     presets: ["es2015", "react"]
   })
   .bundle()
-  .pipe(source('appreact.js'))
+  .pipe(source('menureact.js'))
   .pipe(gulp.dest(path.build.js));
 })
 
