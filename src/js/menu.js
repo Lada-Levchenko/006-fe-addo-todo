@@ -12,7 +12,6 @@ class Menu extends React.Component {
     this.state = {
       projects: MenuStore.getProjects()
     };
-
     this.onGetProjects = this.onGetProjects.bind(this);
   }
 
@@ -42,11 +41,4 @@ class Menu extends React.Component {
   }
 }
 
-
-function renderMenu(){
-  ReactDOM.render(
-    <Menu />,
-    document.getElementById('menu')
-  );
-}
-renderMenu();
+export default Menu;

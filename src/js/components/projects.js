@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import $ from "jquery";
 
 function swap(elToDeactivate, elToActivate){

@@ -31475,6 +31475,13 @@ var MenuActions = function () {
   }
 
   _createClass(MenuActions, [{
+    key: 'authorize',
+    value: function authorize() {
+      _appDispatcher2.default.dispatch({
+        eventName: 'authorize'
+      });
+    }
+  }, {
     key: 'getProjects',
     value: function getProjects(projects) {
       _appDispatcher2.default.dispatch({
@@ -31506,9 +31513,15 @@ var _actions = require("./actions");
 
 var _actions2 = _interopRequireDefault(_actions);
 
+var _jquery = require("jquery");
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var serverURL = "http://127.0.0.1:5000";
 
 var MenuApi = function () {
   function MenuApi() {
@@ -31516,11 +31529,34 @@ var MenuApi = function () {
   }
 
   _createClass(MenuApi, [{
+    key: "authorize",
+    value: function authorize() {
+      var authData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _jquery2.default.ajax({
+        type: "POST",
+        url: serverURL + "/authenticate",
+        data: JSON.stringify({ "username": "Lio", "password": "hello" }),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function success(authdata) {
+          sessionStorage.setItem('access_token', "JWT " + authdata["access_token"]);
+        },
+        failure: function failure(errMsg) {
+          alert(errMsg);
+        }
+      });
+    }
+  }, {
     key: "getProjects",
     value: function getProjects() {
-      setTimeout(function () {
-        //replace with request
-        _actions2.default.getProjects(_projectsData2.default);
+      _jquery2.default.ajax({
+        type: "GET",
+        url: serverURL + "/api/projects",
+        headers: { "Authorization": sessionStorage['access_token'] },
+        success: function success(data) {
+          _actions2.default.getProjects(data);
+        }
       });
     }
   }]);
@@ -31530,7 +31566,7 @@ var MenuApi = function () {
 
 exports.default = new MenuApi();
 
-},{"./../projects-data":189,"./actions":185}],187:[function(require,module,exports){
+},{"./../projects-data":189,"./actions":185,"jquery":27}],187:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
