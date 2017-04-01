@@ -9,6 +9,12 @@ class AuthActions {
     });
   }
 
+  unauthorize() {
+    AppDispatcher.dispatch({
+      eventName: 'unauthorize'
+    });
+  }
+
 }
 
 export default new AuthActions();

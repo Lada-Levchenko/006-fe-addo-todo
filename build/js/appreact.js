@@ -34444,6 +34444,18 @@ var _auth = require('./auth');
 
 var _auth2 = _interopRequireDefault(_auth);
 
+var _store = require('./auth/store');
+
+var _store2 = _interopRequireDefault(_store);
+
+var _tasks = require('./tasks');
+
+var _tasks2 = _interopRequireDefault(_tasks);
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -34458,28 +34470,51 @@ var TodoApp = function (_React$Component) {
   function TodoApp() {
     _classCallCheck(this, TodoApp);
 
-    return _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this));
+    var _this = _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this));
+
+    _this.state = {
+      menu: "",
+      main_area: _react2.default.createElement(_auth2.default, { method: _this.onAuthorized.bind(_this) })
+    };
+    _this.onUnauthorized = _this.onUnauthorized.bind(_this);
+    return _this;
   }
 
   _createClass(TodoApp, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      _store2.default.addEventListener('unauthorize', this.onUnauthorized);
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      _store2.default.addEventListener('unauthorize', this.onUnauthorized);
+    }
+  }, {
     key: 'onAuthorized',
-    value: function onAuthorized() {
-      this.forceUpdate();
+    value: function onAuthorized(username) {
+      this.setState({
+        username: username
+      });
+      (0, _jquery2.default)("username").html(this.state.username);
+    }
+  }, {
+    key: 'onUnauthorized',
+    value: function onUnauthorized() {
+      this.setState({
+        username: "None"
+      });
+      (0, _jquery2.default)("username").html(this.state.username);
     }
   }, {
     key: 'render',
     value: function render() {
-      var menu = "";
-      var main_area = "";
-      if (sessionStorage['access_token']) {
-        menu = _react2.default.createElement(_menu2.default, null);
-        main_area = _react2.default.createElement(
-          'div',
-          { className: 'alert alert-info', role: 'alert' },
-          'Choose one of your projects or date to see the TODO list.'
-        );
+      if (this.state.username != "None") {
+        this.state.menu = _react2.default.createElement(_menu2.default, null);
+        this.state.main_area = _react2.default.createElement(_tasks2.default, null);
       } else {
-        main_area = _react2.default.createElement(_auth2.default, { method: this.onAuthorized.bind(this) });
+        this.state.menu = "";
+        this.state.main_area = _react2.default.createElement(_auth2.default, { method: this.onAuthorized.bind(this) });
       }
       return _react2.default.createElement(
         'span',
@@ -34488,7 +34523,7 @@ var TodoApp = function (_React$Component) {
         _react2.default.createElement(
           'div',
           { className: 'col-sm-2 bg-gray' },
-          menu
+          this.state.menu
         ),
         _react2.default.createElement(
           'div',
@@ -34496,7 +34531,7 @@ var TodoApp = function (_React$Component) {
           _react2.default.createElement(
             'div',
             { className: 'container-fluid', id: 'main_area' },
-            main_area
+            this.state.main_area
           )
         ),
         _react2.default.createElement('div', { className: 'col-sm-3 bg-gray' })
@@ -34523,7 +34558,7 @@ function renderApp() {
 }
 renderApp();
 
-},{"./auth":221,"./components/notfound":225,"./menu":230,"react":215,"react-dom":38,"react-router-dom":176}],221:[function(require,module,exports){
+},{"./auth":221,"./auth/store":224,"./components/notfound":225,"./menu":233,"./tasks":237,"jquery":35,"react":215,"react-dom":38,"react-router-dom":176}],221:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34556,10 +34591,6 @@ var _api = require('./auth/api');
 
 var _api2 = _interopRequireDefault(_api);
 
-var _jquery = require('jquery');
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -34576,7 +34607,6 @@ var Auth = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Auth.__proto__ || Object.getPrototypeOf(Auth)).call(this));
 
-    _this.state = {};
     _this.onAuthorized = _this.onAuthorized.bind(_this);
     return _this;
   }
@@ -34594,9 +34624,7 @@ var Auth = function (_React$Component) {
   }, {
     key: 'onAuthorized',
     value: function onAuthorized() {
-      this.state.username = _store2.default.getUsername();
-      (0, _jquery2.default)("username").html(this.state.username); //doesn't work!!!
-      this.props.method();
+      this.props.method(_store2.default.getUsername());
     }
   }, {
     key: 'render',
@@ -34616,7 +34644,7 @@ var Auth = function (_React$Component) {
 
 exports.default = Auth;
 
-},{"./auth/api":223,"./auth/store":224,"./components/signin":227,"./components/signup":228,"jquery":35,"react":215,"react-dom":38}],222:[function(require,module,exports){
+},{"./auth/api":223,"./auth/store":224,"./components/signin":227,"./components/signup":228,"react":215,"react-dom":38}],222:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34646,6 +34674,13 @@ var AuthActions = function () {
         data: username
       });
     }
+  }, {
+    key: 'unauthorize',
+    value: function unauthorize() {
+      _appDispatcher2.default.dispatch({
+        eventName: 'unauthorize'
+      });
+    }
   }]);
 
   return AuthActions;
@@ -34661,10 +34696,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _projectsData = require("./../projects-data");
-
-var _projectsData2 = _interopRequireDefault(_projectsData);
 
 var _actions = require("./actions");
 
@@ -34725,7 +34756,7 @@ var AuthApi = function () {
 
 exports.default = new AuthApi();
 
-},{"./../projects-data":234,"./actions":222,"jquery":35}],224:[function(require,module,exports){
+},{"./actions":222,"jquery":35}],224:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34795,6 +34826,10 @@ instanseAuthStore.dispatchToken = _appDispatcher2.default.register(function (act
       instanseAuthStore.setUsername(action.data);
       instanseAuthStore.emit(action.eventName);
       return false;
+    case 'unauthorize':
+      instanseAuthStore.setUsername("None");
+      instanseAuthStore.emit(action.eventName);
+      return false;
     default:
       return false;
   }
@@ -34852,6 +34887,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+var _api = require('../menu/api');
+
+var _api2 = _interopRequireDefault(_api);
+
 var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
@@ -34859,8 +34898,18 @@ var _jquery2 = _interopRequireDefault(_jquery);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function swap(elToDeactivate, elToActivate) {
-  (0, _jquery2.default)(elToDeactivate).addClass('deactive');
-  (0, _jquery2.default)(elToActivate).removeClass('deactive');
+  (0, _jquery2.default)(elToDeactivate).addClass('hidden');
+  (0, _jquery2.default)(elToActivate).removeClass('hidden');
+}
+
+function request() {
+  var form = document.getElementById("create-project");
+  var data = {
+    "name": form.name.value,
+    "color": form.color.value
+  };
+  _api2.default.createProject(data);
+  form.reset();
 }
 
 var Projects = function Projects(props) {
@@ -34870,9 +34919,7 @@ var Projects = function Projects(props) {
       { role: 'presentation' },
       _react2.default.createElement(
         'a',
-        { href: '#', onClick: function onClick() {
-            console.log(project.id);
-          } },
+        { href: '#', onClick: props.method.bind(undefined, project.name, "project_id=" + project.id) },
         _react2.default.createElement('span', { className: 'glyphicon glyphicon-record', 'aria-hidden': 'true', style: { color: project.color } }),
         '\xA0',
         project.name,
@@ -34895,20 +34942,29 @@ var Projects = function Projects(props) {
     ),
     _react2.default.createElement(
       'div',
-      { id: 'temp1', className: 'panel adding-panel deactive' },
-      _react2.default.createElement(
-        'a',
-        { href: '#', onClick: swap.bind(undefined, '#temp1', '#perm1') },
-        '- Close'
-      ),
+      { id: 'temp1', className: 'panel adding-panel hidden bg-gray' },
       _react2.default.createElement(
         'form',
-        { className: 'bg-gray' },
-        _react2.default.createElement('input', { type: 'text', className: 'form-control', id: 'projectName', placeholder: 'Project Name' }),
+        { id: 'create-project', className: 'bg-gray' },
         _react2.default.createElement(
-          'button',
-          { type: 'submit', className: 'btn btn-primary' },
-          'Submit'
+          'div',
+          { className: 'input-group' },
+          _react2.default.createElement('input', { type: 'text', name: 'name', className: 'form-control', placeholder: 'Project Name' }),
+          _react2.default.createElement(
+            'span',
+            { className: 'input-group-btn' },
+            _react2.default.createElement('input', { type: 'color', name: 'color', defaultValue: '#ff0000' })
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'input-group' },
+          _react2.default.createElement('input', { onClick: request, type: 'button', className: 'btn btn-primary', value: 'Submit' }),
+          _react2.default.createElement(
+            'a',
+            { href: '#', onClick: swap.bind(undefined, '#temp1', '#perm1'), className: 'btn btn-link text-muted' },
+            'Close'
+          )
         )
       )
     )
@@ -34931,7 +34987,7 @@ var Projects = function Projects(props) {
 
 exports.default = Projects;
 
-},{"jquery":35,"react":215}],227:[function(require,module,exports){
+},{"../menu/api":235,"jquery":35,"react":215}],227:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34973,6 +35029,51 @@ var SignIn = function SignIn(props) {
 exports.default = SignIn;
 
 },{"../auth/api":223,"react":215}],228:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _api = require('../auth/api');
+
+var _api2 = _interopRequireDefault(_api);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function request() {
+  var form = document.getElementById("signup");
+  var data = { "username": form.username.value, "password": form.password.value };
+  _api2.default.signUp(data);
+  form.reset();
+}
+
+var SignUp = function SignUp(props) {
+  return _react2.default.createElement(
+    'form',
+    { id: 'signup' },
+    _react2.default.createElement(
+      'h3',
+      null,
+      'Sign Up'
+    ),
+    _react2.default.createElement('input', { type: 'text', className: 'form-control', name: 'username', placeholder: 'Username' }),
+    _react2.default.createElement('input', { type: 'password', className: 'form-control', name: 'password', placeholder: 'Password' }),
+    _react2.default.createElement(
+      'button',
+      { type: 'submit', className: 'btn btn-primary' },
+      'Sign Up'
+    )
+  );
+};
+
+exports.default = SignUp;
+
+},{"../auth/api":223,"react":215}],229:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34985,28 +35086,26 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SignUp = function SignUp(props) {
+var Task = function Task(props) {
   return _react2.default.createElement(
-    "form",
-    null,
+    "li",
+    { className: "list-group-item" },
     _react2.default.createElement(
-      "h3",
-      null,
-      "Sign Up"
+      "span",
+      { className: "pull-right" },
+      props.project.name,
+      "\xA0",
+      _react2.default.createElement("span", { className: "glyphicon glyphicon-record", "aria-hidden": "true", style: { color: props.project.color } })
     ),
-    _react2.default.createElement("input", { type: "text", className: "form-control", name: "username", placeholder: "Username" }),
-    _react2.default.createElement("input", { type: "password", className: "form-control", name: "password", placeholder: "Password" }),
-    _react2.default.createElement(
-      "button",
-      { type: "submit", className: "btn btn-primary" },
-      "Sign Up"
-    )
+    _react2.default.createElement("span", { className: "glyphicon glyphicon-exclamation-sign priority" + props.priority, "aria-hidden": "true" }),
+    "\xA0",
+    props.name
   );
 };
 
-exports.default = SignUp;
+exports.default = Task;
 
-},{"react":215}],229:[function(require,module,exports){
+},{"react":215}],230:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35017,36 +35116,129 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = require('react-dom');
+var _jquery = require('jquery');
 
-var _reactDom2 = _interopRequireDefault(_reactDom);
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function swap(elToDeactivate, elToActivate) {
+  (0, _jquery2.default)(elToDeactivate).addClass('hidden');
+  (0, _jquery2.default)(elToActivate).removeClass('hidden');
+}
+
+var Taskform = function Taskform(props) {
+  var list = props.projects.map(function (project) {
+    return _react2.default.createElement(
+      'option',
+      { value: project.id },
+      project.name
+    );
+  });
+  return _react2.default.createElement(
+    'span',
+    null,
+    _react2.default.createElement(
+      'a',
+      { href: '#', id: 'perm2', onClick: swap.bind(undefined, '#perm2', '#temp2'), className: 'adding-button' },
+      '+ Add task'
+    ),
+    _react2.default.createElement(
+      'div',
+      { id: 'temp2', className: 'panel hidden' },
+      _react2.default.createElement(
+        'a',
+        { href: '#', onClick: swap.bind(undefined, '#temp2', '#perm2') },
+        '- Close'
+      ),
+      _react2.default.createElement(
+        'form',
+        null,
+        _react2.default.createElement(
+          'div',
+          { className: 'input-group' },
+          _react2.default.createElement('input', { type: 'text', name: 'name', className: 'form-control', placeholder: 'Task Name' }),
+          _react2.default.createElement(
+            'span',
+            { className: 'input-group-btn' },
+            _react2.default.createElement('input', { type: 'date', name: 'date', className: 'form-control' })
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'input-group pull-right' },
+          _react2.default.createElement('select', { className: 'btn btn-default dropdown-toggle', name: 'project_id',
+            'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',
+            children: list }),
+          _react2.default.createElement(
+            'select',
+            { className: 'btn btn-default dropdown-toggle', name: 'priority', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false' },
+            _react2.default.createElement(
+              'option',
+              { value: '1' },
+              'High'
+            ),
+            _react2.default.createElement(
+              'option',
+              { value: '2' },
+              'Medium'
+            ),
+            _react2.default.createElement(
+              'option',
+              { value: '3' },
+              'Low'
+            )
+          )
+        ),
+        _react2.default.createElement(
+          'button',
+          { type: 'submit', className: 'btn btn-primary' },
+          'Submit'
+        )
+      )
+    )
+  );
+};
+
+exports.default = Taskform;
+
+},{"jquery":35,"react":215}],231:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = require("react");
+
+var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Timeswitch = function Timeswitch(props) {
   return _react2.default.createElement(
-    'ul',
-    { className: 'nav nav-pills nav-stacked' },
+    "ul",
+    { className: "nav nav-pills nav-stacked" },
     _react2.default.createElement(
-      'li',
-      { role: 'presentation' },
+      "li",
+      { role: "presentation" },
       _react2.default.createElement(
-        'a',
-        { href: '#', onClick: function onClick() {
+        "a",
+        { href: "#", onClick: function onClick() {
             console.log("today");
           } },
-        'Today'
+        "Today"
       )
     ),
     _react2.default.createElement(
-      'li',
-      { role: 'presentation', onClick: function onClick() {
+      "li",
+      { role: "presentation", onClick: function onClick() {
           console.log("next 7 days");
         } },
       _react2.default.createElement(
-        'a',
-        { href: '#' },
-        'Next 7 days'
+        "a",
+        { href: "#" },
+        "Next 7 days"
       )
     )
   );
@@ -35054,7 +35246,36 @@ var Timeswitch = function Timeswitch(props) {
 
 exports.default = Timeswitch;
 
-},{"react":215,"react-dom":38}],230:[function(require,module,exports){
+},{"react":215}],232:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = AjaxWrapper;
+
+var _actions = require('../auth/actions');
+
+var _actions2 = _interopRequireDefault(_actions);
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function AjaxWrapper(options) {
+    return _jquery2.default.ajax(_jquery2.default.extend({}, options, {
+        error: function error(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 401) {
+                _actions2.default.unauthorize();
+            }
+            //options.error(jqXHR, textStatus, errorThrown);
+        }
+    }));
+};
+
+},{"../auth/actions":222,"jquery":35}],233:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35086,6 +35307,14 @@ var _store2 = _interopRequireDefault(_store);
 var _api = require('./menu/api');
 
 var _api2 = _interopRequireDefault(_api);
+
+var _api3 = require('./tasks/api');
+
+var _api4 = _interopRequireDefault(_api3);
+
+var _store3 = require('./tasks/store');
+
+var _store4 = _interopRequireDefault(_store3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35136,7 +35365,10 @@ var Menu = function (_React$Component) {
         null,
         _react2.default.createElement(_timeswitch2.default, null),
         _react2.default.createElement('br', null),
-        _react2.default.createElement(_projects2.default, { projects: this.state.projects })
+        _react2.default.createElement(_projects2.default, { projects: this.state.projects, method: function method(header, request) {
+            _store4.default.setHeader(header);
+            _api4.default.getTasks(request);
+          } })
       );
     }
   }]);
@@ -35146,7 +35378,7 @@ var Menu = function (_React$Component) {
 
 exports.default = Menu;
 
-},{"./components/projects":226,"./components/timeswitch":229,"./menu/api":232,"./menu/store":233,"react":215,"react-dom":38}],231:[function(require,module,exports){
+},{"./components/projects":226,"./components/timeswitch":231,"./menu/api":235,"./menu/store":236,"./tasks/api":239,"./tasks/store":240,"react":215,"react-dom":38}],234:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35183,7 +35415,7 @@ var MenuActions = function () {
 
 exports.default = new MenuActions();
 
-},{"./../appDispatcher":219}],232:[function(require,module,exports){
+},{"./../appDispatcher":219}],235:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35191,6 +35423,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _ajaxwrapper = require("../helpers/ajaxwrapper");
+
+var _ajaxwrapper2 = _interopRequireDefault(_ajaxwrapper);
 
 var _actions = require("./actions");
 
@@ -35214,9 +35450,28 @@ var MenuApi = function () {
   _createClass(MenuApi, [{
     key: "getProjects",
     value: function getProjects() {
-      _jquery2.default.ajax({
+      (0, _ajaxwrapper2.default)({
         type: "GET",
         url: serverURL + "/api/projects",
+        beforeSend: function beforeSend(xhr) {
+          xhr.setRequestHeader("Accept", "application/json");
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader("Authorization", "JWT " + sessionStorage["access_token"]);
+        },
+        success: function success(data) {
+          _actions2.default.getProjects(data);
+        }
+      });
+    }
+  }, {
+    key: "createProject",
+    value: function createProject(projectData) {
+      (0, _ajaxwrapper2.default)({
+        type: "POST",
+        url: serverURL + "/api/project",
+        data: JSON.stringify(projectData),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
         beforeSend: function beforeSend(xhr) {
           xhr.setRequestHeader("Accept", "application/json");
           xhr.setRequestHeader("Content-Type", "application/json");
@@ -35234,7 +35489,7 @@ var MenuApi = function () {
 
 exports.default = new MenuApi();
 
-},{"./actions":231,"jquery":35}],233:[function(require,module,exports){
+},{"../helpers/ajaxwrapper":232,"./actions":234,"jquery":35}],236:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35311,22 +35566,323 @@ instanseMenuStore.dispatchTocken = _appDispatcher2.default.register(function (ac
 
 exports.default = instanseMenuStore;
 
-},{"./../appDispatcher":219,"events":1}],234:[function(require,module,exports){
+},{"./../appDispatcher":219,"events":1}],237:[function(require,module,exports){
 'use strict';
 
-module.exports = [{
-  id: 1,
-  name: 'project 1',
-  color: '#00dd00',
-  tasks: 5
-}, {
-  id: 2,
-  name: 'project 2',
-  color: '#dd0000'
-}, {
-  id: 3,
-  name: 'project 3',
-  color: '#0000dd'
-}];
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-},{}]},{},[220]);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
+var _task = require('./components/task');
+
+var _task2 = _interopRequireDefault(_task);
+
+var _taskform = require('./components/taskform');
+
+var _taskform2 = _interopRequireDefault(_taskform);
+
+var _store = require('./tasks/store');
+
+var _store2 = _interopRequireDefault(_store);
+
+var _api = require('./tasks/api');
+
+var _api2 = _interopRequireDefault(_api);
+
+var _store3 = require('./menu/store');
+
+var _store4 = _interopRequireDefault(_store3);
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Tasks = function (_React$Component) {
+  _inherits(Tasks, _React$Component);
+
+  function Tasks() {
+    _classCallCheck(this, Tasks);
+
+    var _this = _possibleConstructorReturn(this, (Tasks.__proto__ || Object.getPrototypeOf(Tasks)).call(this));
+
+    _this.state = {
+      header: _store2.default.getHeader(),
+      tasks: _store2.default.getTasks(),
+      projects: _store4.default.getProjects()
+    };
+    _this.onGetTasks = _this.onGetTasks.bind(_this);
+    _this.onGetProjects = _this.onGetProjects.bind(_this);
+    return _this;
+  }
+
+  _createClass(Tasks, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      _store2.default.addEventListener('get-tasks', this.onGetTasks);
+      _store4.default.addEventListener('get-projects', this.onGetProjects);
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      _store2.default.removeEventListener('get-tasks', this.onGetTasks);
+      _store4.default.removeEventListener('get-projects', this.onGetProjects);
+    }
+  }, {
+    key: 'onGetTasks',
+    value: function onGetTasks() {
+      this.setState({
+        header: _store2.default.getHeader(),
+        tasks: _store2.default.getTasks()
+      });
+    }
+  }, {
+    key: 'onGetProjects',
+    value: function onGetProjects() {
+      this.setState({
+        projects: _store4.default.getProjects()
+      });
+    }
+  }, {
+    key: 'renderTask',
+    value: function renderTask(task) {
+      return _react2.default.createElement(_task2.default, { name: task.name, priority: task.priority, project: task.project });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      var element = "";
+      if (this.state.tasks.length > 0) {
+        var sortedTasks = this.state.tasks.sort(function (a, b) {
+          return a.priority - b.priority;
+        });
+        var list = sortedTasks.map(function (task) {
+          return _this2.renderTask.call(_this2, task);
+        });
+        element = _react2.default.createElement('ul', { className: 'list-group', children: list });
+      } else {
+        element = _react2.default.createElement(
+          'div',
+          { className: 'alert alert-info', role: 'alert' },
+          'Choose one of your projects or date to see the TODO list.'
+        );
+      }
+      return _react2.default.createElement(
+        'span',
+        null,
+        _react2.default.createElement(
+          'h4',
+          null,
+          this.state.header
+        ),
+        element,
+        _react2.default.createElement(_taskform2.default, { projects: this.state.projects })
+      );
+    }
+  }]);
+
+  return Tasks;
+}(_react2.default.Component);
+
+exports.default = Tasks;
+
+},{"./components/task":229,"./components/taskform":230,"./menu/store":236,"./tasks/api":239,"./tasks/store":240,"jquery":35,"react":215,"react-dom":38}],238:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _appDispatcher = require('./../appDispatcher');
+
+var _appDispatcher2 = _interopRequireDefault(_appDispatcher);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TasksActions = function () {
+  function TasksActions() {
+    _classCallCheck(this, TasksActions);
+  }
+
+  _createClass(TasksActions, [{
+    key: 'getTasks',
+    value: function getTasks(tasks) {
+      _appDispatcher2.default.dispatch({
+        eventName: 'get-tasks',
+        data: tasks
+      });
+    }
+  }]);
+
+  return TasksActions;
+}();
+
+exports.default = new TasksActions();
+
+},{"./../appDispatcher":219}],239:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _ajaxwrapper = require("../helpers/ajaxwrapper");
+
+var _ajaxwrapper2 = _interopRequireDefault(_ajaxwrapper);
+
+var _actions = require("./actions");
+
+var _actions2 = _interopRequireDefault(_actions);
+
+var _jquery = require("jquery");
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var serverURL = "http://127.0.0.1:5000";
+
+var TasksApi = function () {
+  function TasksApi() {
+    _classCallCheck(this, TasksApi);
+  }
+
+  _createClass(TasksApi, [{
+    key: "getTasks",
+    value: function getTasks(filter) {
+      (0, _ajaxwrapper2.default)({
+        type: "GET",
+        url: serverURL + "/api/tasks?" + filter,
+        beforeSend: function beforeSend(xhr) {
+          xhr.setRequestHeader("Accept", "application/json");
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader("Authorization", "JWT " + sessionStorage["access_token"]);
+        },
+        success: function success(data) {
+          _actions2.default.getTasks(data);
+        }
+      });
+    }
+  }]);
+
+  return TasksApi;
+}();
+
+exports.default = new TasksApi();
+
+},{"../helpers/ajaxwrapper":232,"./actions":238,"jquery":35}],240:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _appDispatcher = require("./../appDispatcher");
+
+var _appDispatcher2 = _interopRequireDefault(_appDispatcher);
+
+var _events = require("events");
+
+var _events2 = _interopRequireDefault(_events);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var TasksStore = function (_EventEmiter) {
+  _inherits(TasksStore, _EventEmiter);
+
+  function TasksStore() {
+    _classCallCheck(this, TasksStore);
+
+    var _this = _possibleConstructorReturn(this, (TasksStore.__proto__ || Object.getPrototypeOf(TasksStore)).call(this));
+
+    _this.tasks = [];
+    _this.header = "";
+    return _this;
+  }
+
+  _createClass(TasksStore, [{
+    key: "addEventListener",
+    value: function addEventListener(event, callback) {
+      this.on(event, callback);
+    }
+  }, {
+    key: "removeEventListener",
+    value: function removeEventListener(event, callback) {
+      this.removeListener(event, callback);
+    }
+  }, {
+    key: "setTasks",
+    value: function setTasks(list) {
+      this.tasks = list;
+    }
+  }, {
+    key: "getTasks",
+    value: function getTasks() {
+      return this.tasks;
+    }
+  }, {
+    key: "setHeader",
+    value: function setHeader(header) {
+      this.header = header;
+    }
+  }, {
+    key: "getHeader",
+    value: function getHeader() {
+      return this.header;
+    }
+  }]);
+
+  return TasksStore;
+}(_events2.default);
+
+var instanseTasksStore = new TasksStore();
+
+instanseTasksStore.dispatchTocken = _appDispatcher2.default.register(function (action) {
+  switch (action.eventName) {
+    case 'get-tasks':
+      instanseTasksStore.setTasks(action.data);
+      instanseTasksStore.emit(action.eventName);
+      return false;
+    default:
+      return false;
+  }
+});
+
+exports.default = instanseTasksStore;
+
+},{"./../appDispatcher":219,"events":1}]},{},[220]);

@@ -4,12 +4,10 @@ import SignIn from './components/signin';
 import SignUp from './components/signup';
 import AuthStore from './auth/store';
 import AuthApi from './auth/api';
-import $ from 'jquery';
 
 class Auth extends React.Component {
   constructor() {
     super();
-    this.state = {};
     this.onAuthorized = this.onAuthorized.bind(this);
   }
 
@@ -22,9 +20,7 @@ class Auth extends React.Component {
   }
 
   onAuthorized() {
-    this.state.username = AuthStore.getUsername();
-    $("username").html(this.state.username); //doesn't work!!!
-    this.props.method();
+    this.props.method(AuthStore.getUsername());
   }
 
   render() {

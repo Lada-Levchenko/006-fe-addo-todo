@@ -33,6 +33,10 @@ instanseAuthStore.dispatchToken = AppDispatcher.register((action)=> {
       instanseAuthStore.setUsername(action.data);
       instanseAuthStore.emit(action.eventName);
       return false;
+    case 'unauthorize':
+      instanseAuthStore.setUsername("None");
+      instanseAuthStore.emit(action.eventName);
+      return false;
     default:
       return false;
   }

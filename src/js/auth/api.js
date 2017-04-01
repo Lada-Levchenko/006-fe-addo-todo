@@ -1,4 +1,3 @@
-import Data from "./../projects-data";
 import AuthActions from "./actions";
 import $ from "jquery";
 
