@@ -5,7 +5,7 @@ import Project from './components/project';
 import ProjectForm from './components/projectform';
 import MenuStore from './menu/store';
 import MenuApi from './menu/api';
-import MenuActions from './menu/actions';
+import {GET_PROJECTS, PROJECTS_CHANGED} from "./helpers/constants";
 import TasksApi from './tasks/api';
 import TasksStore from "./tasks/store";
 
@@ -29,13 +29,14 @@ class Menu extends React.Component {
   }
 
   componentDidMount() {
-    MenuStore.addEventListener(MenuActions.GET_PROJECTS, this.onGetProjects);
-    MenuStore.addEventListener(MenuActions.CHANGED, this.onChanged);
+    MenuStore.addEventListener(GET_PROJECTS, this.onGetProjects);
+    MenuStore.addEventListener(PROJECTS_CHANGED, this.onChanged);
     MenuApi.getProjects();
   }
 
   componentWillUnmount() {
-    MenuStore.removeEventListener(MenuActions.GET_PROJECTS, this.onGetProjects);
+    MenuStore.removeEventListener(GET_PROJECTS, this.onGetProjects);
+    MenuStore.removeEventListener(PROJECTS_CHANGED, this.onChanged);
   }
 
   renderProjects(){

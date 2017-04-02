@@ -1,6 +1,5 @@
 import AppDispatcher from './../appDispatcher';
-
-  const GET_TASKS = 'get-tasks';
+import {GET_TASKS} from "../helpers/constants";
 
 class TasksActions {
 

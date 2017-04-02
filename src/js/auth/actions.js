@@ -1,17 +1,7 @@
 import AppDispatcher from './../appDispatcher';
-
-const AUTHORIZE = 'authorized';
-const UNAUTHORIZE = 'unauthorized';
+import {AUTHORIZE, UNAUTHORIZE} from "../helpers/constants"
 
 class AuthActions {
-
-  static get AUTHORIZED() {
-    return AUTHORIZE;
-  }
-
-  static get UNAUTHORIZED() {
-    return UNAUTHORIZE;
-  }
 
   authorize(username) {
     AppDispatcher.dispatch({

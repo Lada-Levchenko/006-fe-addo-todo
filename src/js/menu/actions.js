@@ -1,17 +1,7 @@
 import AppDispatcher from './../appDispatcher';
-
-const GET_PROJECTS = 'get-projects';
-const CHANGED = 'changed';
+import {GET_PROJECTS, PROJECTS_CHANGED} from "../helpers/constants"
 
 class MenuActions {
-
-  static get GET_PROJECTS() {
-    return GET_PROJECTS;
-  }
-
-  static get CHANGED() {
-    return CHANGED;
-  }
 
   getProjects(projects) {
     AppDispatcher.dispatch({
@@ -22,7 +12,7 @@ class MenuActions {
 
   changed(){
     AppDispatcher.dispatch({
-      eventName: CHANGED
+      eventName: PROJECTS_CHANGED
     });
   }
 

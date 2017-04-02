@@ -6,6 +6,7 @@ import Menu from './menu';
 import Auth from './auth';
 import AuthActions from './auth/actions';
 import AuthStore from './auth/store';
+import {AUTHORIZE, UNAUTHORIZE} from "./helpers/constants";
 import Tasks from './tasks';
 import $ from 'jquery';
 
@@ -21,13 +22,13 @@ class TodoApp extends React.Component {
   }
 
   componentDidMount() {
-    AuthStore.addEventListener(AuthActions.AUTHORIZED, this.onAuthorized);
-    AuthStore.addEventListener(AuthActions.UNAUTHORIZED, this.onUnauthorized);
+    AuthStore.addEventListener(AUTHORIZE, this.onAuthorized);
+    AuthStore.addEventListener(UNAUTHORIZE, this.onUnauthorized);
   }
 
   componentWillUnmount() {
-    AuthStore.removeEventListener(AuthActions.AUTHORIZED, this.onAuthorized);
-    AuthStore.removeEventListener(AuthActions.UNAUTHORIZED, this.onUnauthorized);
+    AuthStore.removeEventListener(AUTHORIZE, this.onAuthorized);
+    AuthStore.removeEventListener(UNAUTHORIZE, this.onUnauthorized);
   }
 
   onAuthorized(){

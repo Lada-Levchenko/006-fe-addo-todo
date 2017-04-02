@@ -34452,6 +34452,8 @@ var _store = require('./auth/store');
 
 var _store2 = _interopRequireDefault(_store);
 
+var _constants = require('./helpers/constants');
+
 var _tasks = require('./tasks');
 
 var _tasks2 = _interopRequireDefault(_tasks);
@@ -34488,14 +34490,14 @@ var TodoApp = function (_React$Component) {
   _createClass(TodoApp, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      _store2.default.addEventListener(_actions2.default.AUTHORIZED, this.onAuthorized);
-      _store2.default.addEventListener(_actions2.default.UNAUTHORIZED, this.onUnauthorized);
+      _store2.default.addEventListener(_constants.AUTHORIZE, this.onAuthorized);
+      _store2.default.addEventListener(_constants.UNAUTHORIZE, this.onUnauthorized);
     }
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      _store2.default.removeEventListener(_actions2.default.AUTHORIZED, this.onAuthorized);
-      _store2.default.removeEventListener(_actions2.default.UNAUTHORIZED, this.onUnauthorized);
+      _store2.default.removeEventListener(_constants.AUTHORIZE, this.onAuthorized);
+      _store2.default.removeEventListener(_constants.UNAUTHORIZE, this.onUnauthorized);
     }
   }, {
     key: 'onAuthorized',
@@ -34564,7 +34566,7 @@ function renderApp() {
 }
 renderApp();
 
-},{"./auth":221,"./auth/actions":222,"./auth/store":224,"./components/notfound":225,"./menu":234,"./tasks":238,"jquery":35,"react":215,"react-dom":38,"react-router-dom":176}],221:[function(require,module,exports){
+},{"./auth":221,"./auth/actions":222,"./auth/store":224,"./components/notfound":225,"./helpers/constants":234,"./menu":235,"./tasks":239,"jquery":35,"react":215,"react-dom":38,"react-router-dom":176}],221:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34625,7 +34627,7 @@ var Auth = function (_React$Component) {
 exports.default = Auth;
 
 },{"./components/signin":228,"./components/signup":229,"react":215,"react-dom":38}],222:[function(require,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -34633,16 +34635,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _appDispatcher = require('./../appDispatcher');
+var _appDispatcher = require("./../appDispatcher");
 
 var _appDispatcher2 = _interopRequireDefault(_appDispatcher);
+
+var _constants = require("../helpers/constants");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var AUTHORIZE = 'authorized';
-var UNAUTHORIZE = 'unauthorized';
 
 var AuthActions = function () {
   function AuthActions() {
@@ -34650,29 +34651,19 @@ var AuthActions = function () {
   }
 
   _createClass(AuthActions, [{
-    key: 'authorize',
+    key: "authorize",
     value: function authorize(username) {
       _appDispatcher2.default.dispatch({
-        eventName: AUTHORIZE,
+        eventName: _constants.AUTHORIZE,
         data: username
       });
     }
   }, {
-    key: 'unauthorize',
+    key: "unauthorize",
     value: function unauthorize() {
       _appDispatcher2.default.dispatch({
-        eventName: UNAUTHORIZE
+        eventName: _constants.UNAUTHORIZE
       });
-    }
-  }], [{
-    key: 'AUTHORIZED',
-    get: function get() {
-      return AUTHORIZE;
-    }
-  }, {
-    key: 'UNAUTHORIZED',
-    get: function get() {
-      return UNAUTHORIZE;
     }
   }]);
 
@@ -34681,7 +34672,7 @@ var AuthActions = function () {
 
 exports.default = new AuthActions();
 
-},{"./../appDispatcher":219}],223:[function(require,module,exports){
+},{"../helpers/constants":234,"./../appDispatcher":219}],223:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34750,7 +34741,7 @@ var AuthApi = function () {
 exports.default = new AuthApi();
 
 },{"./actions":222,"jquery":35}],224:[function(require,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -34758,17 +34749,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _appDispatcher = require('./../appDispatcher');
+var _appDispatcher = require("./../appDispatcher");
 
 var _appDispatcher2 = _interopRequireDefault(_appDispatcher);
 
-var _events = require('events');
+var _events = require("events");
 
 var _events2 = _interopRequireDefault(_events);
 
-var _actions = require('./actions');
-
-var _actions2 = _interopRequireDefault(_actions);
+var _constants = require("../helpers/constants");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34791,22 +34780,22 @@ var AuthStore = function (_EventEmiter) {
   }
 
   _createClass(AuthStore, [{
-    key: 'addEventListener',
+    key: "addEventListener",
     value: function addEventListener(event, callback) {
       this.on(event, callback);
     }
   }, {
-    key: 'removeEventListener',
+    key: "removeEventListener",
     value: function removeEventListener(event, callback) {
       this.removeListener(event, callback);
     }
   }, {
-    key: 'setUsername',
+    key: "setUsername",
     value: function setUsername(name) {
       this.username = name;
     }
   }, {
-    key: 'getUsername',
+    key: "getUsername",
     value: function getUsername() {
       return this.username;
     }
@@ -34819,11 +34808,11 @@ var instanseAuthStore = new AuthStore();
 
 instanseAuthStore.dispatchTocken = _appDispatcher2.default.register(function (action) {
   switch (action.eventName) {
-    case _actions2.default.AUTHORIZED:
+    case _constants.AUTHORIZE:
       instanseAuthStore.setUsername(action.data);
       instanseAuthStore.emit(action.eventName);
       return false;
-    case _actions2.default.UNAUTHORIZED:
+    case _constants.UNAUTHORIZE:
       instanseAuthStore.setUsername("None");
       instanseAuthStore.emit(action.eventName);
       return false;
@@ -34834,7 +34823,7 @@ instanseAuthStore.dispatchTocken = _appDispatcher2.default.register(function (ac
 
 exports.default = instanseAuthStore;
 
-},{"./../appDispatcher":219,"./actions":222,"events":1}],225:[function(require,module,exports){
+},{"../helpers/constants":234,"./../appDispatcher":219,"events":1}],225:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34916,7 +34905,7 @@ var Projects = function Projects(props) {
 
 exports.default = Projects;
 
-},{"../menu/api":236,"jquery":35,"react":215}],227:[function(require,module,exports){
+},{"../menu/api":237,"jquery":35,"react":215}],227:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34994,7 +34983,7 @@ var ProjectForm = function ProjectForm(props) {
 
 exports.default = ProjectForm;
 
-},{"../menu/api":236,"jquery":35,"react":215}],228:[function(require,module,exports){
+},{"../menu/api":237,"jquery":35,"react":215}],228:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35288,6 +35277,18 @@ function AjaxWrapper(options) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+var AUTHORIZE = exports.AUTHORIZE = 'authorized';
+var UNAUTHORIZE = exports.UNAUTHORIZE = 'unauthorized';
+var GET_PROJECTS = exports.GET_PROJECTS = 'get-projects';
+var PROJECTS_CHANGED = exports.PROJECTS_CHANGED = 'projects-changed';
+var GET_TASKS = exports.GET_TASKS = 'get-tasks';
+
+},{}],235:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -35319,9 +35320,7 @@ var _api = require('./menu/api');
 
 var _api2 = _interopRequireDefault(_api);
 
-var _actions = require('./menu/actions');
-
-var _actions2 = _interopRequireDefault(_actions);
+var _constants = require('./helpers/constants');
 
 var _api3 = require('./tasks/api');
 
@@ -35370,14 +35369,15 @@ var Menu = function (_React$Component) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
-      _store2.default.addEventListener(_actions2.default.GET_PROJECTS, this.onGetProjects);
-      _store2.default.addEventListener(_actions2.default.CHANGED, this.onChanged);
+      _store2.default.addEventListener(_constants.GET_PROJECTS, this.onGetProjects);
+      _store2.default.addEventListener(_constants.PROJECTS_CHANGED, this.onChanged);
       _api2.default.getProjects();
     }
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      _store2.default.removeEventListener(_actions2.default.GET_PROJECTS, this.onGetProjects);
+      _store2.default.removeEventListener(_constants.GET_PROJECTS, this.onGetProjects);
+      _store2.default.removeEventListener(_constants.PROJECTS_CHANGED, this.onChanged);
     }
   }, {
     key: 'renderProjects',
@@ -35422,8 +35422,8 @@ var Menu = function (_React$Component) {
 
 exports.default = Menu;
 
-},{"./components/project":226,"./components/projectform":227,"./components/timeswitch":232,"./menu/actions":235,"./menu/api":236,"./menu/store":237,"./tasks/api":240,"./tasks/store":241,"react":215,"react-dom":38}],235:[function(require,module,exports){
-'use strict';
+},{"./components/project":226,"./components/projectform":227,"./components/timeswitch":232,"./helpers/constants":234,"./menu/api":237,"./menu/store":238,"./tasks/api":241,"./tasks/store":242,"react":215,"react-dom":38}],236:[function(require,module,exports){
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -35431,16 +35431,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _appDispatcher = require('./../appDispatcher');
+var _appDispatcher = require("./../appDispatcher");
 
 var _appDispatcher2 = _interopRequireDefault(_appDispatcher);
+
+var _constants = require("../helpers/constants");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var GET_PROJECTS = 'get-projects';
-var CHANGED = 'changed';
 
 var MenuActions = function () {
   function MenuActions() {
@@ -35448,29 +35447,19 @@ var MenuActions = function () {
   }
 
   _createClass(MenuActions, [{
-    key: 'getProjects',
+    key: "getProjects",
     value: function getProjects(projects) {
       _appDispatcher2.default.dispatch({
-        eventName: GET_PROJECTS,
+        eventName: _constants.GET_PROJECTS,
         data: projects
       });
     }
   }, {
-    key: 'changed',
+    key: "changed",
     value: function changed() {
       _appDispatcher2.default.dispatch({
-        eventName: CHANGED
+        eventName: _constants.PROJECTS_CHANGED
       });
-    }
-  }], [{
-    key: 'GET_PROJECTS',
-    get: function get() {
-      return GET_PROJECTS;
-    }
-  }, {
-    key: 'CHANGED',
-    get: function get() {
-      return CHANGED;
     }
   }]);
 
@@ -35479,7 +35468,7 @@ var MenuActions = function () {
 
 exports.default = new MenuActions();
 
-},{"./../appDispatcher":219}],236:[function(require,module,exports){
+},{"../helpers/constants":234,"./../appDispatcher":219}],237:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35553,7 +35542,7 @@ var MenuApi = function () {
 
 exports.default = new MenuApi();
 
-},{"../helpers/ajaxwrapper":233,"./actions":235,"jquery":35}],237:[function(require,module,exports){
+},{"../helpers/ajaxwrapper":233,"./actions":236,"jquery":35}],238:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35570,9 +35559,7 @@ var _events = require("events");
 
 var _events2 = _interopRequireDefault(_events);
 
-var _actions = require("./actions");
-
-var _actions2 = _interopRequireDefault(_actions);
+var _constants = require("../helpers/constants");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35623,11 +35610,11 @@ var instanseMenuStore = new MenuStore();
 
 instanseMenuStore.dispatchTocken = _appDispatcher2.default.register(function (action) {
   switch (action.eventName) {
-    case _actions2.default.GET_PROJECTS:
+    case _constants.GET_PROJECTS:
       instanseMenuStore.setProjects(action.data);
       instanseMenuStore.emit(action.eventName);
       return false;
-    case _actions2.default.CHANGED:
+    case _constants.PROJECTS_CHANGED:
       instanseMenuStore.emit(action.eventName);
       return false;
     default:
@@ -35637,7 +35624,7 @@ instanseMenuStore.dispatchTocken = _appDispatcher2.default.register(function (ac
 
 exports.default = instanseMenuStore;
 
-},{"./../appDispatcher":219,"./actions":235,"events":1}],238:[function(require,module,exports){
+},{"../helpers/constants":234,"./../appDispatcher":219,"events":1}],239:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35670,17 +35657,11 @@ var _api = require('./tasks/api');
 
 var _api2 = _interopRequireDefault(_api);
 
-var _actions = require('./tasks/actions');
-
-var _actions2 = _interopRequireDefault(_actions);
-
 var _store3 = require('./menu/store');
 
 var _store4 = _interopRequireDefault(_store3);
 
-var _actions3 = require('./menu/actions');
-
-var _actions4 = _interopRequireDefault(_actions3);
+var _constants = require('./helpers/constants');
 
 var _jquery = require('jquery');
 
@@ -35715,14 +35696,14 @@ var Tasks = function (_React$Component) {
   _createClass(Tasks, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      _store2.default.addEventListener(_actions2.default.GET_TASKS, this.onGetTasks);
-      _store4.default.addEventListener(_actions4.default.GET_PROJECTS, this.onGetProjects);
+      _store2.default.addEventListener(_constants.GET_TASKS, this.onGetTasks);
+      _store4.default.addEventListener(_constants.GET_PROJECTS, this.onGetProjects);
     }
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      _store2.default.removeEventListener(_actions2.default.GET_TASKS, this.onGetTasks);
-      _store4.default.removeEventListener(_actions4.default.GET_PROJECTS, this.onGetProjects);
+      _store2.default.removeEventListener(_constants.GET_TASKS, this.onGetTasks);
+      _store4.default.removeEventListener(_constants.GET_PROJECTS, this.onGetProjects);
     }
   }, {
     key: 'onGetTasks',
@@ -35784,8 +35765,8 @@ var Tasks = function (_React$Component) {
 
 exports.default = Tasks;
 
-},{"./components/task":230,"./components/taskform":231,"./menu/actions":235,"./menu/store":237,"./tasks/actions":239,"./tasks/api":240,"./tasks/store":241,"jquery":35,"react":215,"react-dom":38}],239:[function(require,module,exports){
-'use strict';
+},{"./components/task":230,"./components/taskform":231,"./helpers/constants":234,"./menu/store":238,"./tasks/api":241,"./tasks/store":242,"jquery":35,"react":215,"react-dom":38}],240:[function(require,module,exports){
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -35793,15 +35774,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _appDispatcher = require('./../appDispatcher');
+var _appDispatcher = require("./../appDispatcher");
 
 var _appDispatcher2 = _interopRequireDefault(_appDispatcher);
+
+var _constants = require("../helpers/constants");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var GET_TASKS = 'get-tasks';
 
 var TasksActions = function () {
   function TasksActions() {
@@ -35809,17 +35790,17 @@ var TasksActions = function () {
   }
 
   _createClass(TasksActions, [{
-    key: 'getTasks',
+    key: "getTasks",
     value: function getTasks(tasks) {
       _appDispatcher2.default.dispatch({
-        eventName: GET_TASKS,
+        eventName: _constants.GET_TASKS,
         data: tasks
       });
     }
   }], [{
-    key: 'GET_TASKS',
+    key: "GET_TASKS",
     get: function get() {
-      return GET_TASKS;
+      return _constants.GET_TASKS;
     }
   }]);
 
@@ -35828,7 +35809,7 @@ var TasksActions = function () {
 
 exports.default = new TasksActions();
 
-},{"./../appDispatcher":219}],240:[function(require,module,exports){
+},{"../helpers/constants":234,"./../appDispatcher":219}],241:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35883,7 +35864,7 @@ var TasksApi = function () {
 
 exports.default = new TasksApi();
 
-},{"../helpers/ajaxwrapper":233,"./actions":239,"jquery":35}],241:[function(require,module,exports){
+},{"../helpers/ajaxwrapper":233,"./actions":240,"jquery":35}],242:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35899,6 +35880,8 @@ var _appDispatcher2 = _interopRequireDefault(_appDispatcher);
 var _events = require("events");
 
 var _events2 = _interopRequireDefault(_events);
+
+var _constants = require("../helpers/constants");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35960,7 +35943,7 @@ var instanseTasksStore = new TasksStore();
 
 instanseTasksStore.dispatchTocken = _appDispatcher2.default.register(function (action) {
   switch (action.eventName) {
-    case 'get-tasks':
+    case _constants.GET_TASKS:
       instanseTasksStore.setTasks(action.data);
       instanseTasksStore.emit(action.eventName);
       return false;
@@ -35971,4 +35954,4 @@ instanseTasksStore.dispatchTocken = _appDispatcher2.default.register(function (a
 
 exports.default = instanseTasksStore;
 
-},{"./../appDispatcher":219,"events":1}]},{},[220]);
+},{"../helpers/constants":234,"./../appDispatcher":219,"events":1}]},{},[220]);

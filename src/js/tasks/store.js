@@ -1,5 +1,6 @@
 import AppDispatcher from './../appDispatcher';
 import EventEmiter from "events";
+import {GET_TASKS} from "../helpers/constants";
 
 class TasksStore extends EventEmiter {
   constructor() {
@@ -38,7 +39,7 @@ let instanseTasksStore = new TasksStore();
 
 instanseTasksStore.dispatchTocken = AppDispatcher.register((action)=> {
   switch (action.eventName) {
-    case 'get-tasks':
+    case GET_TASKS:
       instanseTasksStore.setTasks(action.data);
       instanseTasksStore.emit(action.eventName);
       return false;
