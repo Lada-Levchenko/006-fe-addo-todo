@@ -34478,8 +34478,9 @@ var TodoApp = function (_React$Component) {
 
     _this.state = {
       menu: "",
-      main_area: _react2.default.createElement(_auth2.default, { method: _this.onAuthorized.bind(_this) })
+      main_area: _react2.default.createElement(_auth2.default, null)
     };
+    _this.onAuthorized = _this.onAuthorized.bind(_this);
     _this.onUnauthorized = _this.onUnauthorized.bind(_this);
     return _this;
   }
@@ -34487,18 +34488,21 @@ var TodoApp = function (_React$Component) {
   _createClass(TodoApp, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
-      _store2.default.addEventListener(_actions2.default.UNAUTHORIZE, this.onUnauthorized);
+      _store2.default.addEventListener(_actions2.default.AUTHORIZED, this.onAuthorized);
+      _store2.default.addEventListener(_actions2.default.UNAUTHORIZED, this.onUnauthorized);
     }
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      _store2.default.addEventListener(_actions2.default.UNAUTHORIZE, this.onUnauthorized);
+      _store2.default.removeEventListener(_actions2.default.AUTHORIZED, this.onAuthorized);
+      _store2.default.removeEventListener(_actions2.default.UNAUTHORIZED, this.onUnauthorized);
     }
   }, {
     key: 'onAuthorized',
-    value: function onAuthorized(username) {
+    value: function onAuthorized() {
+      console.log("here");
       this.setState({
-        username: username,
+        username: _store2.default.getUsername(),
         menu: _react2.default.createElement(_menu2.default, null),
         main_area: _react2.default.createElement(_tasks2.default, null)
       });
@@ -34507,10 +34511,11 @@ var TodoApp = function (_React$Component) {
   }, {
     key: 'onUnauthorized',
     value: function onUnauthorized() {
+      console.log("here");
       this.setState({
         username: "None",
         menu: "",
-        main_area: _react2.default.createElement(_auth2.default, { method: this.onAuthorized.bind(this) })
+        main_area: _react2.default.createElement(_auth2.default, null)
       });
       (0, _jquery2.default)("username").html(this.state.username);
     }
@@ -34584,18 +34589,6 @@ var _signup = require('./components/signup');
 
 var _signup2 = _interopRequireDefault(_signup);
 
-var _store = require('./auth/store');
-
-var _store2 = _interopRequireDefault(_store);
-
-var _api = require('./auth/api');
-
-var _api2 = _interopRequireDefault(_api);
-
-var _actions = require('./auth/actions');
-
-var _actions2 = _interopRequireDefault(_actions);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -34610,28 +34603,10 @@ var Auth = function (_React$Component) {
   function Auth() {
     _classCallCheck(this, Auth);
 
-    var _this = _possibleConstructorReturn(this, (Auth.__proto__ || Object.getPrototypeOf(Auth)).call(this));
-
-    _this.onAuthorized = _this.onAuthorized.bind(_this);
-    return _this;
+    return _possibleConstructorReturn(this, (Auth.__proto__ || Object.getPrototypeOf(Auth)).apply(this, arguments));
   }
 
   _createClass(Auth, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      _store2.default.addEventListener(_actions2.default.AUTHORIZE, this.onAuthorized);
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      _store2.default.removeEventListener(_actions2.default.AUTHORIZE, this.onAuthorized);
-    }
-  }, {
-    key: 'onAuthorized',
-    value: function onAuthorized() {
-      this.props.method(_store2.default.getUsername());
-    }
-  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
@@ -34649,7 +34624,7 @@ var Auth = function (_React$Component) {
 
 exports.default = Auth;
 
-},{"./auth/actions":222,"./auth/api":223,"./auth/store":224,"./components/signin":228,"./components/signup":229,"react":215,"react-dom":38}],222:[function(require,module,exports){
+},{"./components/signin":228,"./components/signup":229,"react":215,"react-dom":38}],222:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34666,8 +34641,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var AUTHORIZE = 'authorize';
-var UNAUTHORIZE = 'unauthorize';
+var AUTHORIZE = 'authorized';
+var UNAUTHORIZE = 'unauthorized';
 
 var AuthActions = function () {
   function AuthActions() {
@@ -34690,12 +34665,12 @@ var AuthActions = function () {
       });
     }
   }], [{
-    key: 'AUTHORIZE',
+    key: 'AUTHORIZED',
     get: function get() {
       return AUTHORIZE;
     }
   }, {
-    key: 'UNAUTHORIZE',
+    key: 'UNAUTHORIZED',
     get: function get() {
       return UNAUTHORIZE;
     }
@@ -34775,7 +34750,7 @@ var AuthApi = function () {
 exports.default = new AuthApi();
 
 },{"./actions":222,"jquery":35}],224:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -34783,13 +34758,17 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _appDispatcher = require("./../appDispatcher");
+var _appDispatcher = require('./../appDispatcher');
 
 var _appDispatcher2 = _interopRequireDefault(_appDispatcher);
 
-var _events = require("events");
+var _events = require('events');
 
 var _events2 = _interopRequireDefault(_events);
+
+var _actions = require('./actions');
+
+var _actions2 = _interopRequireDefault(_actions);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34812,22 +34791,22 @@ var AuthStore = function (_EventEmiter) {
   }
 
   _createClass(AuthStore, [{
-    key: "addEventListener",
+    key: 'addEventListener',
     value: function addEventListener(event, callback) {
       this.on(event, callback);
     }
   }, {
-    key: "removeEventListener",
+    key: 'removeEventListener',
     value: function removeEventListener(event, callback) {
       this.removeListener(event, callback);
     }
   }, {
-    key: "setUsername",
+    key: 'setUsername',
     value: function setUsername(name) {
       this.username = name;
     }
   }, {
-    key: "getUsername",
+    key: 'getUsername',
     value: function getUsername() {
       return this.username;
     }
@@ -34838,13 +34817,13 @@ var AuthStore = function (_EventEmiter) {
 
 var instanseAuthStore = new AuthStore();
 
-instanseAuthStore.dispatchToken = _appDispatcher2.default.register(function (action) {
+instanseAuthStore.dispatchTocken = _appDispatcher2.default.register(function (action) {
   switch (action.eventName) {
-    case 'authorize':
+    case _actions2.default.AUTHORIZED:
       instanseAuthStore.setUsername(action.data);
       instanseAuthStore.emit(action.eventName);
       return false;
-    case 'unauthorize':
+    case _actions2.default.UNAUTHORIZED:
       instanseAuthStore.setUsername("None");
       instanseAuthStore.emit(action.eventName);
       return false;
@@ -34855,7 +34834,7 @@ instanseAuthStore.dispatchToken = _appDispatcher2.default.register(function (act
 
 exports.default = instanseAuthStore;
 
-},{"./../appDispatcher":219,"events":1}],225:[function(require,module,exports){
+},{"./../appDispatcher":219,"./actions":222,"events":1}],225:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

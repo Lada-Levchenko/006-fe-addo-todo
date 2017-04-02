@@ -1,15 +1,15 @@
 import AppDispatcher from './../appDispatcher';
 
-const AUTHORIZE = 'authorize';
-const UNAUTHORIZE = 'unauthorize';
+const AUTHORIZE = 'authorized';
+const UNAUTHORIZE = 'unauthorized';
 
 class AuthActions {
 
-  static get AUTHORIZE() {
+  static get AUTHORIZED() {
     return AUTHORIZE;
   }
 
-  static get UNAUTHORIZE() {
+  static get UNAUTHORIZED() {
     return UNAUTHORIZE;
   }
 

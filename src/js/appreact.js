@@ -14,22 +14,26 @@ class TodoApp extends React.Component {
     super();
     this.state = {
       menu: "",
-      main_area: <Auth method={this.onAuthorized.bind(this)}/>
+      main_area: <Auth />
     }
+    this.onAuthorized = this.onAuthorized.bind(this);
     this.onUnauthorized = this.onUnauthorized.bind(this);
   }
 
   componentDidMount() {
-    AuthStore.addEventListener(AuthActions.UNAUTHORIZE, this.onUnauthorized);
+    AuthStore.addEventListener(AuthActions.AUTHORIZED, this.onAuthorized);
+    AuthStore.addEventListener(AuthActions.UNAUTHORIZED, this.onUnauthorized);
   }
 
   componentWillUnmount() {
-    AuthStore.addEventListener(AuthActions.UNAUTHORIZE, this.onUnauthorized);
+    AuthStore.removeEventListener(AuthActions.AUTHORIZED, this.onAuthorized);
+    AuthStore.removeEventListener(AuthActions.UNAUTHORIZED, this.onUnauthorized);
   }
 
-  onAuthorized(username){
+  onAuthorized(){
+    console.log("here");
     this.setState({
-      username: username,
+      username: AuthStore.getUsername(),
       menu: <Menu />,
       main_area: <Tasks />
     });
@@ -37,10 +41,11 @@ class TodoApp extends React.Component {
   }
 
   onUnauthorized(){
+    console.log("here");
     this.setState({
       username: "None",
       menu: "",
-      main_area:<Auth method={this.onAuthorized.bind(this)}/>
+      main_area: <Auth />
     });
     $("username").html(this.state.username);
   }

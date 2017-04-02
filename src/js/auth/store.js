@@ -1,5 +1,6 @@
 import AppDispatcher from './../appDispatcher';
 import EventEmiter from "events";
+import AuthActions from './actions';
 
 class AuthStore extends EventEmiter {
   constructor() {
@@ -27,13 +28,13 @@ class AuthStore extends EventEmiter {
 
 let instanseAuthStore = new AuthStore();
 
-instanseAuthStore.dispatchToken = AppDispatcher.register((action)=> {
+instanseAuthStore.dispatchTocken = AppDispatcher.register((action)=> {
   switch (action.eventName) {
-    case 'authorize':
+    case AuthActions.AUTHORIZED:
       instanseAuthStore.setUsername(action.data);
       instanseAuthStore.emit(action.eventName);
       return false;
-    case 'unauthorize':
+    case AuthActions.UNAUTHORIZED:
       instanseAuthStore.setUsername("None");
       instanseAuthStore.emit(action.eventName);
       return false;
