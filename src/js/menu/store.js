@@ -33,6 +33,9 @@ instanseMenuStore.dispatchTocken = AppDispatcher.register((action)=> {
       instanseMenuStore.setProjects(action.data);
       instanseMenuStore.emit(action.eventName);
       return false;
+    case 'changed':
+      instanseMenuStore.emit(action.eventName);
+      return false;
     default:
       return false;
   }

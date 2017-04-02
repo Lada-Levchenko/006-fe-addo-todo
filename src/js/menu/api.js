@@ -35,7 +35,7 @@ class MenuApi {
         xhr.setRequestHeader ("Authorization", "JWT " + sessionStorage["access_token"]);
       },
       success: function(data){
-          MenuActions.getProjects(data);
+          MenuActions.changed();
         }
       }
     );

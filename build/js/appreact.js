@@ -34558,7 +34558,7 @@ function renderApp() {
 }
 renderApp();
 
-},{"./auth":221,"./auth/store":224,"./components/notfound":225,"./menu":233,"./tasks":237,"jquery":35,"react":215,"react-dom":38,"react-router-dom":176}],221:[function(require,module,exports){
+},{"./auth":221,"./auth/store":224,"./components/notfound":225,"./menu":234,"./tasks":238,"jquery":35,"react":215,"react-dom":38,"react-router-dom":176}],221:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34644,7 +34644,7 @@ var Auth = function (_React$Component) {
 
 exports.default = Auth;
 
-},{"./auth/api":223,"./auth/store":224,"./components/signin":227,"./components/signup":228,"react":215,"react-dom":38}],222:[function(require,module,exports){
+},{"./auth/api":223,"./auth/store":224,"./components/signin":228,"./components/signup":229,"react":215,"react-dom":38}],222:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -34897,6 +34897,49 @@ var _jquery2 = _interopRequireDefault(_jquery);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var Projects = function Projects(props) {
+  return _react2.default.createElement(
+    'li',
+    { role: 'presentation' },
+    _react2.default.createElement(
+      'a',
+      { href: '#', onClick: props.method.bind(undefined, props.project.name, "project_id=" + props.project.id) },
+      _react2.default.createElement('span', { className: 'glyphicon glyphicon-record', 'aria-hidden': 'true', style: { color: props.project.color } }),
+      '\xA0',
+      props.project.name,
+      '\xA0',
+      _react2.default.createElement(
+        'span',
+        { className: 'badge' },
+        props.project.tasks
+      )
+    )
+  );
+};
+
+exports.default = Projects;
+
+},{"../menu/api":236,"jquery":35,"react":215}],227:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _api = require('../menu/api');
+
+var _api2 = _interopRequireDefault(_api);
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function swap(elToDeactivate, elToActivate) {
   (0, _jquery2.default)(elToDeactivate).addClass('hidden');
   (0, _jquery2.default)(elToActivate).removeClass('hidden');
@@ -34912,27 +34955,8 @@ function request() {
   form.reset();
 }
 
-var Projects = function Projects(props) {
-  var list = props.projects.map(function (project) {
-    return _react2.default.createElement(
-      'li',
-      { role: 'presentation' },
-      _react2.default.createElement(
-        'a',
-        { href: '#', onClick: props.method.bind(undefined, project.name, "project_id=" + project.id) },
-        _react2.default.createElement('span', { className: 'glyphicon glyphicon-record', 'aria-hidden': 'true', style: { color: project.color } }),
-        '\xA0',
-        project.name,
-        '\xA0',
-        _react2.default.createElement(
-          'span',
-          { className: 'badge' },
-          project.tasks
-        )
-      )
-    );
-  });
-  list.push(_react2.default.createElement(
+var ProjectForm = function ProjectForm(props) {
+  return _react2.default.createElement(
     'li',
     { role: 'presentation' },
     _react2.default.createElement(
@@ -34968,26 +34992,12 @@ var Projects = function Projects(props) {
         )
       )
     )
-  ));
-  return _react2.default.createElement(
-    'div',
-    null,
-    _react2.default.createElement(
-      'u',
-      null,
-      _react2.default.createElement(
-        'h5',
-        null,
-        'Projects:'
-      )
-    ),
-    _react2.default.createElement('ul', { className: 'nav nav-pills nav-stacked', children: list })
   );
 };
 
-exports.default = Projects;
+exports.default = ProjectForm;
 
-},{"../menu/api":235,"jquery":35,"react":215}],227:[function(require,module,exports){
+},{"../menu/api":236,"jquery":35,"react":215}],228:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35028,7 +35038,7 @@ var SignIn = function SignIn(props) {
 
 exports.default = SignIn;
 
-},{"../auth/api":223,"react":215}],228:[function(require,module,exports){
+},{"../auth/api":223,"react":215}],229:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35073,7 +35083,7 @@ var SignUp = function SignUp(props) {
 
 exports.default = SignUp;
 
-},{"../auth/api":223,"react":215}],229:[function(require,module,exports){
+},{"../auth/api":223,"react":215}],230:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35105,7 +35115,7 @@ var Task = function Task(props) {
 
 exports.default = Task;
 
-},{"react":215}],230:[function(require,module,exports){
+},{"react":215}],231:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35202,7 +35212,7 @@ var Taskform = function Taskform(props) {
 
 exports.default = Taskform;
 
-},{"jquery":35,"react":215}],231:[function(require,module,exports){
+},{"jquery":35,"react":215}],232:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35246,7 +35256,7 @@ var Timeswitch = function Timeswitch(props) {
 
 exports.default = Timeswitch;
 
-},{"react":215}],232:[function(require,module,exports){
+},{"react":215}],233:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35275,7 +35285,7 @@ function AjaxWrapper(options) {
     }));
 };
 
-},{"../auth/actions":222,"jquery":35}],233:[function(require,module,exports){
+},{"../auth/actions":222,"jquery":35}],234:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35296,9 +35306,13 @@ var _timeswitch = require('./components/timeswitch');
 
 var _timeswitch2 = _interopRequireDefault(_timeswitch);
 
-var _projects = require('./components/projects');
+var _project = require('./components/project');
 
-var _projects2 = _interopRequireDefault(_projects);
+var _project2 = _interopRequireDefault(_project);
+
+var _projectform = require('./components/projectform');
+
+var _projectform2 = _interopRequireDefault(_projectform);
 
 var _store = require('./menu/store');
 
@@ -35336,6 +35350,7 @@ var Menu = function (_React$Component) {
       projects: _store2.default.getProjects()
     };
     _this.onGetProjects = _this.onGetProjects.bind(_this);
+    _this.onChanged = _this.onChanged.bind(_this);
     return _this;
   }
 
@@ -35347,15 +35362,33 @@ var Menu = function (_React$Component) {
       });
     }
   }, {
+    key: 'onChanged',
+    value: function onChanged() {
+      _api2.default.getProjects();
+    }
+  }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
       _store2.default.addEventListener('get-projects', this.onGetProjects);
+      _store2.default.addEventListener('changed', this.onChanged);
       _api2.default.getProjects();
     }
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       _store2.default.removeEventListener('get-projects', this.onGetProjects);
+    }
+  }, {
+    key: 'renderProjects',
+    value: function renderProjects() {
+      var list = this.state.projects.map(function (data) {
+        return _react2.default.createElement(_project2.default, { project: data, method: function method(header, request) {
+            _store4.default.setHeader(header);
+            _api4.default.getTasks(request);
+          } });
+      });
+      list.push(_react2.default.createElement(_projectform2.default, null));
+      return list;
     }
   }, {
     key: 'render',
@@ -35365,10 +35398,20 @@ var Menu = function (_React$Component) {
         null,
         _react2.default.createElement(_timeswitch2.default, null),
         _react2.default.createElement('br', null),
-        _react2.default.createElement(_projects2.default, { projects: this.state.projects, method: function method(header, request) {
-            _store4.default.setHeader(header);
-            _api4.default.getTasks(request);
-          } })
+        _react2.default.createElement(
+          'div',
+          null,
+          _react2.default.createElement(
+            'u',
+            null,
+            _react2.default.createElement(
+              'h5',
+              null,
+              'Projects:'
+            )
+          ),
+          _react2.default.createElement('ul', { className: 'nav nav-pills nav-stacked', children: this.renderProjects() })
+        )
       );
     }
   }]);
@@ -35378,7 +35421,7 @@ var Menu = function (_React$Component) {
 
 exports.default = Menu;
 
-},{"./components/projects":226,"./components/timeswitch":231,"./menu/api":235,"./menu/store":236,"./tasks/api":239,"./tasks/store":240,"react":215,"react-dom":38}],234:[function(require,module,exports){
+},{"./components/project":226,"./components/projectform":227,"./components/timeswitch":232,"./menu/api":236,"./menu/store":237,"./tasks/api":240,"./tasks/store":241,"react":215,"react-dom":38}],235:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35408,6 +35451,13 @@ var MenuActions = function () {
         data: projects
       });
     }
+  }, {
+    key: 'changed',
+    value: function changed() {
+      _appDispatcher2.default.dispatch({
+        eventName: 'changed'
+      });
+    }
   }]);
 
   return MenuActions;
@@ -35415,7 +35465,7 @@ var MenuActions = function () {
 
 exports.default = new MenuActions();
 
-},{"./../appDispatcher":219}],235:[function(require,module,exports){
+},{"./../appDispatcher":219}],236:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35478,7 +35528,7 @@ var MenuApi = function () {
           xhr.setRequestHeader("Authorization", "JWT " + sessionStorage["access_token"]);
         },
         success: function success(data) {
-          _actions2.default.getProjects(data);
+          _actions2.default.changed();
         }
       });
     }
@@ -35489,7 +35539,7 @@ var MenuApi = function () {
 
 exports.default = new MenuApi();
 
-},{"../helpers/ajaxwrapper":232,"./actions":234,"jquery":35}],236:[function(require,module,exports){
+},{"../helpers/ajaxwrapper":233,"./actions":235,"jquery":35}],237:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35559,6 +35609,9 @@ instanseMenuStore.dispatchTocken = _appDispatcher2.default.register(function (ac
       instanseMenuStore.setProjects(action.data);
       instanseMenuStore.emit(action.eventName);
       return false;
+    case 'changed':
+      instanseMenuStore.emit(action.eventName);
+      return false;
     default:
       return false;
   }
@@ -35566,7 +35619,7 @@ instanseMenuStore.dispatchTocken = _appDispatcher2.default.register(function (ac
 
 exports.default = instanseMenuStore;
 
-},{"./../appDispatcher":219,"events":1}],237:[function(require,module,exports){
+},{"./../appDispatcher":219,"events":1}],238:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35705,7 +35758,7 @@ var Tasks = function (_React$Component) {
 
 exports.default = Tasks;
 
-},{"./components/task":229,"./components/taskform":230,"./menu/store":236,"./tasks/api":239,"./tasks/store":240,"jquery":35,"react":215,"react-dom":38}],238:[function(require,module,exports){
+},{"./components/task":230,"./components/taskform":231,"./menu/store":237,"./tasks/api":240,"./tasks/store":241,"jquery":35,"react":215,"react-dom":38}],239:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -35742,7 +35795,7 @@ var TasksActions = function () {
 
 exports.default = new TasksActions();
 
-},{"./../appDispatcher":219}],239:[function(require,module,exports){
+},{"./../appDispatcher":219}],240:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35797,7 +35850,7 @@ var TasksApi = function () {
 
 exports.default = new TasksApi();
 
-},{"../helpers/ajaxwrapper":232,"./actions":238,"jquery":35}],240:[function(require,module,exports){
+},{"../helpers/ajaxwrapper":233,"./actions":239,"jquery":35}],241:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {

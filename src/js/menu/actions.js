@@ -9,6 +9,12 @@ class MenuActions {
     });
   }
 
+  changed(){
+    AppDispatcher.dispatch({
+      eventName: 'changed'
+    });
+  }
+
 }
 
 export default new MenuActions();

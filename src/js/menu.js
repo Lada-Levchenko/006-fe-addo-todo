@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Timeswitch from './components/timeswitch';
-import Projects from './components/projects';
+import Project from './components/project';
+import ProjectForm from './components/projectform';
 import MenuStore from './menu/store';
 import MenuApi from './menu/api';
 import TasksApi from './tasks/api';
@@ -14,6 +15,7 @@ class Menu extends React.Component {
       projects: MenuStore.getProjects()
     };
     this.onGetProjects = this.onGetProjects.bind(this);
+    this.onChanged = this.onChanged.bind(this);
   }
 
   onGetProjects() {
@@ -21,9 +23,13 @@ class Menu extends React.Component {
       projects: MenuStore.getProjects()
     });
   }
+  onChanged(){
+    MenuApi.getProjects();
+  }
 
   componentDidMount() {
     MenuStore.addEventListener('get-projects', this.onGetProjects);
+    MenuStore.addEventListener('changed', this.onChanged);
     MenuApi.getProjects();
   }
 
@@ -31,17 +37,30 @@ class Menu extends React.Component {
     MenuStore.removeEventListener('get-projects', this.onGetProjects);
   }
 
+  renderProjects(){
+    let list = this.state.projects.map(data => {
+      return (
+        <Project project={data} method={
+          (header, request) => {
+            TasksStore.setHeader(header);
+            TasksApi.getTasks (request);
+          }
+        } />
+      );
+    });
+    list.push(<ProjectForm />);
+    return list;
+  }
+
   render() {
     return (
       <div>
         <Timeswitch />
         <br />
-        <Projects projects={this.state.projects} method={
-          (header, request) => {
-            TasksStore.setHeader(header);
-            TasksApi.getTasks (request);
-          }
-        }/>
+        <div>
+          <u><h5>Projects:</h5></u>
+          <ul className="nav nav-pills nav-stacked" children={this.renderProjects()} />
+        </div>
       </div>
     );
   }
