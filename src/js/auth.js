@@ -4,6 +4,7 @@ import SignIn from './components/signin';
 import SignUp from './components/signup';
 import AuthStore from './auth/store';
 import AuthApi from './auth/api';
+import AuthActions from './auth/actions';
 
 class Auth extends React.Component {
   constructor() {
@@ -12,11 +13,11 @@ class Auth extends React.Component {
   }
 
   componentDidMount() {
-    AuthStore.addEventListener('authorize', this.onAuthorized);
+    AuthStore.addEventListener(AuthActions.AUTHORIZE, this.onAuthorized);
   }
 
   componentWillUnmount() {
-    AuthStore.removeEventListener('authorize', this.onAuthorized);
+    AuthStore.removeEventListener(AuthActions.AUTHORIZE, this.onAuthorized);
   }
 
   onAuthorized() {

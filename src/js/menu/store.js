@@ -1,5 +1,6 @@
 import AppDispatcher from './../appDispatcher';
 import EventEmiter from "events";
+import MenuActions from "./actions";
 
 class MenuStore extends EventEmiter {
   constructor() {
@@ -29,11 +30,11 @@ let instanseMenuStore = new MenuStore();
 
 instanseMenuStore.dispatchTocken = AppDispatcher.register((action)=> {
   switch (action.eventName) {
-    case 'get-projects':
+    case MenuActions.GET_PROJECTS:
       instanseMenuStore.setProjects(action.data);
       instanseMenuStore.emit(action.eventName);
       return false;
-    case 'changed':
+    case MenuActions.CHANGED:
       instanseMenuStore.emit(action.eventName);
       return false;
     default:

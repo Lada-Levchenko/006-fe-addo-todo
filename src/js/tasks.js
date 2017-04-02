@@ -4,7 +4,9 @@ import Task from './components/task';
 import Taskform from './components/taskform';
 import TasksStore from './tasks/store';
 import TasksApi from './tasks/api';
+import TasksActions from './tasks/actions';
 import MenuStore from './menu/store';
+import MenuActions from './menu/actions';
 import $ from 'jquery';
 
 
@@ -21,13 +23,13 @@ class Tasks extends React.Component {
   }
 
   componentDidMount() {
-    TasksStore.addEventListener('get-tasks', this.onGetTasks);
-    MenuStore.addEventListener('get-projects', this.onGetProjects);
+    TasksStore.addEventListener(TasksActions.GET_TASKS, this.onGetTasks);
+    MenuStore.addEventListener(MenuActions.GET_PROJECTS, this.onGetProjects);
   }
 
   componentWillUnmount() {
-    TasksStore.removeEventListener('get-tasks', this.onGetTasks);
-    MenuStore.removeEventListener('get-projects', this.onGetProjects);
+    TasksStore.removeEventListener(TasksActions.GET_TASKS, this.onGetTasks);
+    MenuStore.removeEventListener(MenuActions.GET_PROJECTS, this.onGetProjects);
   }
 
   onGetTasks() {

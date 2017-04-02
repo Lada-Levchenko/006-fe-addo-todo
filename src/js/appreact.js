@@ -4,6 +4,7 @@ import { HashRouter, Route, Link, Switch } from 'react-router-dom';
 import NotFound from './components/notfound';
 import Menu from './menu';
 import Auth from './auth';
+import AuthActions from './auth/actions';
 import AuthStore from './auth/store';
 import Tasks from './tasks';
 import $ from 'jquery';
@@ -19,11 +20,11 @@ class TodoApp extends React.Component {
   }
 
   componentDidMount() {
-    AuthStore.addEventListener('unauthorize', this.onUnauthorized);
+    AuthStore.addEventListener(AuthActions.UNAUTHORIZE, this.onUnauthorized);
   }
 
   componentWillUnmount() {
-    AuthStore.addEventListener('unauthorize', this.onUnauthorized);
+    AuthStore.addEventListener(AuthActions.UNAUTHORIZE, this.onUnauthorized);
   }
 
   onAuthorized(username){
