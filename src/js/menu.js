@@ -61,7 +61,12 @@ class Menu extends React.Component {
   render() {
     return (
       <div>
-        <Timeswitch />
+        <Timeswitch method={
+          (header, request) => {
+            TasksStore.setHeader(header);
+            TasksApi.getTasks (request);
+          }
+        } />
         <br />
         <div>
           <u><h5>Projects:</h5></u>

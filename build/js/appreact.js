@@ -34929,7 +34929,7 @@ var Projects = function Projects(props) {
     { role: 'presentation' },
     _react2.default.createElement(
       'a',
-      { href: '#', onClick: props.method.bind(undefined, props.project.name, "project_id=" + props.project.id) },
+      { href: '#', onClick: props.method.bind(undefined, props.project.name, "?project_id=" + props.project.id) },
       _react2.default.createElement('span', { className: 'glyphicon glyphicon-record', 'aria-hidden': 'true', style: { color: props.project.color } }),
       '\xA0',
       props.project.name,
@@ -35432,42 +35432,50 @@ var Taskform = function (_React$Component) {
 exports.default = Taskform;
 
 },{"../menu/store":238,"../tasks/api":241,"jquery":35,"react":215}],232:[function(require,module,exports){
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _react = require("react");
+var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function getCurrDate() {
+  var now = new Date();
+  return now.getFullYear() + '-' + ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
+}
+
+function getDateIn(days) {
+  var now = new Date();
+  var date = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+  var formatted = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+  return formatted;
+}
+
 var Timeswitch = function Timeswitch(props) {
   return _react2.default.createElement(
-    "ul",
-    { className: "nav nav-pills nav-stacked" },
+    'ul',
+    { className: 'nav nav-pills nav-stacked' },
     _react2.default.createElement(
-      "li",
-      { role: "presentation" },
+      'li',
+      { role: 'presentation' },
       _react2.default.createElement(
-        "a",
-        { href: "#", onClick: function onClick() {
-            console.log("today");
-          } },
-        "Today"
+        'a',
+        { href: '#', onClick: props.method.bind(undefined, "Today", "/dates?start_date=" + getCurrDate() + "&end_date=" + getCurrDate()) },
+        'Today'
       )
     ),
     _react2.default.createElement(
-      "li",
-      { role: "presentation", onClick: function onClick() {
-          console.log("next 7 days");
-        } },
+      'li',
+      { role: 'presentation', onClick: props.method.bind(undefined, "Next 7 days", "/dates?start_date=" + getCurrDate() + "&end_date=" + getDateIn(7)) },
       _react2.default.createElement(
-        "a",
-        { href: "#" },
-        "Next 7 days"
+        'a',
+        { href: '#' },
+        'Next 7 days'
       )
     )
   );
@@ -35635,7 +35643,10 @@ var Menu = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         null,
-        _react2.default.createElement(_timeswitch2.default, null),
+        _react2.default.createElement(_timeswitch2.default, { method: function method(header, request) {
+            _store4.default.setHeader(header);
+            _api4.default.getTasks(request);
+          } }),
         _react2.default.createElement('br', null),
         _react2.default.createElement(
           'div',
@@ -36101,7 +36112,7 @@ var TasksApi = function () {
     value: function getTasks(filter) {
       (0, _ajaxwrapper2.default)({
         type: "GET",
-        url: serverURL + "/api/tasks?" + filter,
+        url: serverURL + "/api/tasks" + filter,
         beforeSend: function beforeSend(xhr) {
           xhr.setRequestHeader("Accept", "application/json");
           xhr.setRequestHeader("Content-Type", "application/json");

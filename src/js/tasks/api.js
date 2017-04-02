@@ -9,7 +9,7 @@ class TasksApi {
   getTasks(filter) {
     AjaxWrapper({
       type: "GET",
-      url: serverURL + "/api/tasks?" + filter,
+      url: serverURL + "/api/tasks" + filter,
       beforeSend: function (xhr) {
         xhr.setRequestHeader("Accept", "application/json");
         xhr.setRequestHeader("Content-Type", "application/json");
