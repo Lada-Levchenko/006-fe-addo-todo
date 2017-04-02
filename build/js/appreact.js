@@ -34494,7 +34494,9 @@ var TodoApp = function (_React$Component) {
     key: 'onAuthorized',
     value: function onAuthorized(username) {
       this.setState({
-        username: username
+        username: username,
+        menu: _react2.default.createElement(_menu2.default, null),
+        main_area: _react2.default.createElement(_tasks2.default, null)
       });
       (0, _jquery2.default)("username").html(this.state.username);
     }
@@ -34502,20 +34504,15 @@ var TodoApp = function (_React$Component) {
     key: 'onUnauthorized',
     value: function onUnauthorized() {
       this.setState({
-        username: "None"
+        username: "None",
+        menu: "",
+        main_area: _react2.default.createElement(_auth2.default, { method: this.onAuthorized.bind(this) })
       });
       (0, _jquery2.default)("username").html(this.state.username);
     }
   }, {
     key: 'render',
     value: function render() {
-      if (this.state.username != "None") {
-        this.state.menu = _react2.default.createElement(_menu2.default, null);
-        this.state.main_area = _react2.default.createElement(_tasks2.default, null);
-      } else {
-        this.state.menu = "";
-        this.state.main_area = _react2.default.createElement(_auth2.default, { method: this.onAuthorized.bind(this) });
-      }
       return _react2.default.createElement(
         'span',
         null,

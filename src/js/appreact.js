@@ -28,27 +28,23 @@ class TodoApp extends React.Component {
 
   onAuthorized(username){
     this.setState({
-      username: username
+      username: username,
+      menu: <Menu />,
+      main_area: <Tasks />
     });
     $("username").html(this.state.username);
   }
 
   onUnauthorized(){
     this.setState({
-      username: "None"
+      username: "None",
+      menu: "",
+      main_area:<Auth method={this.onAuthorized.bind(this)}/>
     });
     $("username").html(this.state.username);
   }
 
   render() {
-    if(this.state.username != "None"){
-      this.state.menu = <Menu />;
-      this.state.main_area = <Tasks />
-    }
-    else{
-      this.state.menu = "";
-      this.state.main_area = <Auth method={this.onAuthorized.bind(this)}/>
-    }
     return (
       <span>
         <div className="col-sm-1 bg-gray"></div>
