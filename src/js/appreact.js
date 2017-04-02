@@ -13,9 +13,17 @@ import $ from 'jquery';
 class TodoApp extends React.Component {
   constructor() {
     super();
-    this.state = {
-      menu: "",
-      main_area: <Auth />
+    if(sessionStorage["access_token"]){
+      this.state = {
+        menu: <Menu />,
+        main_area: <Tasks />
+      }
+    }
+    else{
+      this.state = {
+        menu: "",
+        main_area: <Auth />
+      }
     }
     this.onAuthorized = this.onAuthorized.bind(this);
     this.onUnauthorized = this.onUnauthorized.bind(this);
@@ -32,7 +40,6 @@ class TodoApp extends React.Component {
   }
 
   onAuthorized(){
-    console.log("here");
     this.setState({
       username: AuthStore.getUsername(),
       menu: <Menu />,
@@ -42,7 +49,6 @@ class TodoApp extends React.Component {
   }
 
   onUnauthorized(){
-    console.log("here");
     this.setState({
       username: "None",
       menu: "",

@@ -7,36 +7,55 @@ function swap(elToDeactivate, elToActivate){
   $(elToActivate).removeClass('hidden');
 }
 
-function request(){
-  let form = document.getElementById("create-project");
-  let data = {
-    "name": form.name.value,
-    "color": form.color.value
-  };
-  MenuApi.createProject(data);
-  form.reset();
-}
+class ProjectForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      name: '',
+      color: ''
+    };
 
-let ProjectForm = (props)=> {
-  return (
-    <li role="presentation">
-      <a href="#" id="perm1" onClick={swap.bind(this, '#perm1', '#temp1')} className="adding-button">+ Add project</a>
-      <div id="temp1" className="panel adding-panel hidden bg-gray">
-        <form id="create-project" className="bg-gray">
-          <div className="input-group">
-            <input type="text" name="name" className="form-control" placeholder="Project Name" />
-            <span className="input-group-btn">
-              <input type="color" name="color" defaultValue="#ff0000" />
-            </span>
-          </div>
-          <div className="input-group">
-            <input onClick={request} type="button" className="btn btn-primary" value="Submit" />
-            <a href="#" onClick={swap.bind(this, '#temp1', '#perm1')} className="btn btn-link text-muted">Close</a>
-          </div>
-        </form>
-      </div>
-    </li>
-  )
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
+  }
+
+  handleSubmit(event) {
+    let data = {"name": this.state.name, "color": this.state.color };
+    MenuApi.createProject(data);
+    event.preventDefault();
+  }
+
+  render() {
+    return (
+      <span>
+        <a href="#" id="perm1" onClick={swap.bind(this, '#perm1', '#temp1')} className="adding-button">+ Add project</a>
+        <div id="temp1" className="panel adding-panel hidden bg-gray">
+          <form onSubmit={this.handleSubmit} className="bg-gray">
+            <div className="input-group">
+              <input type="text" name="name" className="form-control" onChange={this.handleInputChange} placeholder="Project Name" />
+              <span className="input-group-btn">
+                <input type="color" name="color" defaultValue="#ff0000" onChange={this.handleInputChange} />
+              </span>
+            </div>
+            <div className="input-group">
+              <input type="submit" className="btn btn-primary" value="Submit" />
+              <a href="#" onClick={swap.bind(this, '#temp1', '#perm1')} className="btn btn-link text-muted">Close</a>
+            </div>
+          </form>
+        </div>
+      </span>
+    );
+  }
 }
 
 export default ProjectForm;

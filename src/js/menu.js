@@ -50,7 +50,11 @@ class Menu extends React.Component {
         } />
       );
     });
-    list.push(<ProjectForm />);
+    list.push(
+      <li role="presentation">
+        <ProjectForm />
+      </li>
+    );
     return list;
   }
 

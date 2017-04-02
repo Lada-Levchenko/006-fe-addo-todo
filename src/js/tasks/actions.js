@@ -1,17 +1,20 @@
 import AppDispatcher from './../appDispatcher';
-import {GET_TASKS} from "../helpers/constants";
+import {GET_TASKS, TASKS_CHANGED} from "../helpers/constants";
 
 class TasksActions {
-
-  static get GET_TASKS() {
-    return GET_TASKS;
-  }
 
 
   getTasks(tasks) {
     AppDispatcher.dispatch({
       eventName: GET_TASKS,
       data: tasks
+    });
+  }
+
+  changed(project){
+    AppDispatcher.dispatch({
+      eventName: TASKS_CHANGED,
+      data: project
     });
   }
 

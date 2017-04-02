@@ -22,6 +22,25 @@ class TasksApi {
     );
   }
 
+  createTask(taskData) {
+    AjaxWrapper({
+      type: "POST",
+      url: serverURL + "/api/task",
+      data: JSON.stringify(taskData),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader ("Authorization", "JWT " + sessionStorage["access_token"]);
+      },
+      success: function(data){
+          TasksActions.changed(taskData.project);
+        }
+      }
+    );
+  }
+
 }
 
 export default new TasksApi();

@@ -34478,10 +34478,17 @@ var TodoApp = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this));
 
-    _this.state = {
-      menu: "",
-      main_area: _react2.default.createElement(_auth2.default, null)
-    };
+    if (sessionStorage["access_token"]) {
+      _this.state = {
+        menu: _react2.default.createElement(_menu2.default, null),
+        main_area: _react2.default.createElement(_tasks2.default, null)
+      };
+    } else {
+      _this.state = {
+        menu: "",
+        main_area: _react2.default.createElement(_auth2.default, null)
+      };
+    }
     _this.onAuthorized = _this.onAuthorized.bind(_this);
     _this.onUnauthorized = _this.onUnauthorized.bind(_this);
     return _this;
@@ -34502,7 +34509,6 @@ var TodoApp = function (_React$Component) {
   }, {
     key: 'onAuthorized',
     value: function onAuthorized() {
-      console.log("here");
       this.setState({
         username: _store2.default.getUsername(),
         menu: _react2.default.createElement(_menu2.default, null),
@@ -34513,7 +34519,6 @@ var TodoApp = function (_React$Component) {
   }, {
     key: 'onUnauthorized',
     value: function onUnauthorized() {
-      console.log("here");
       this.setState({
         username: "None",
         menu: "",
@@ -34701,8 +34706,31 @@ var AuthApi = function () {
   }
 
   _createClass(AuthApi, [{
+    key: "getUsername",
+    value: function getUsername() {
+      _jquery2.default.ajax({
+        type: "GET",
+        url: serverURL + "/api/user",
+        beforeSend: function beforeSend(xhr) {
+          xhr.setRequestHeader("Accept", "application/json");
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader("Authorization", "JWT " + sessionStorage["access_token"]);
+        },
+        success: function success(user) {
+          _actions2.default.authorize(user["username"]);
+        }
+      });
+    }
+  }, {
+    key: "getUsernameWithToken",
+    value: function getUsernameWithToken(response) {
+      sessionStorage["access_token"] = response["access_token"];
+      this.getUsername();
+    }
+  }, {
     key: "signIn",
     value: function signIn(authData) {
+      this.getUsernameWithToken = this.getUsernameWithToken.bind(this);
       _jquery2.default.ajax({
         type: "POST",
         url: serverURL + "/authenticate",
@@ -34713,21 +34741,33 @@ var AuthApi = function () {
           xhr.setRequestHeader("Accept", "application/json");
           xhr.setRequestHeader("Content-Type", "application/json");
         },
-        success: function success(response) {
-          sessionStorage["access_token"] = response["access_token"];
-          _jquery2.default.ajax({
-            type: "GET",
-            url: serverURL + "/api/user",
-            beforeSend: function beforeSend(xhr) {
-              xhr.setRequestHeader("Accept", "application/json");
-              xhr.setRequestHeader("Content-Type", "application/json");
-              xhr.setRequestHeader("Authorization", "JWT " + sessionStorage["access_token"]);
-            },
-            success: function success(user) {
-              _actions2.default.authorize(user["username"]);
-            }
-          });
+        success: this.getUsernameWithToken,
+        failure: function failure(errMsg) {
+          alert(errMsg);
+        }
+      });
+    }
+  }, {
+    key: "signInAfterCreated",
+    value: function signInAfterCreated() {
+      this.signIn(this.authData);
+    }
+  }, {
+    key: "signUp",
+    value: function signUp(authData) {
+      this.authData = authData;
+      this.signInAfterCreated = this.signInAfterCreated.bind(this);
+      _jquery2.default.ajax({
+        type: "POST",
+        url: serverURL + "/api/user",
+        data: JSON.stringify(authData),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: function beforeSend(xhr) {
+          xhr.setRequestHeader("Accept", "application/json");
+          xhr.setRequestHeader("Content-Type", "application/json");
         },
+        success: this.signInAfterCreated,
         failure: function failure(errMsg) {
           alert(errMsg);
         }
@@ -34912,6 +34952,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -34926,60 +34968,98 @@ var _jquery2 = _interopRequireDefault(_jquery);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 function swap(elToDeactivate, elToActivate) {
   (0, _jquery2.default)(elToDeactivate).addClass('hidden');
   (0, _jquery2.default)(elToActivate).removeClass('hidden');
 }
 
-function request() {
-  var form = document.getElementById("create-project");
-  var data = {
-    "name": form.name.value,
-    "color": form.color.value
-  };
-  _api2.default.createProject(data);
-  form.reset();
-}
+var ProjectForm = function (_React$Component) {
+  _inherits(ProjectForm, _React$Component);
 
-var ProjectForm = function ProjectForm(props) {
-  return _react2.default.createElement(
-    'li',
-    { role: 'presentation' },
-    _react2.default.createElement(
-      'a',
-      { href: '#', id: 'perm1', onClick: swap.bind(undefined, '#perm1', '#temp1'), className: 'adding-button' },
-      '+ Add project'
-    ),
-    _react2.default.createElement(
-      'div',
-      { id: 'temp1', className: 'panel adding-panel hidden bg-gray' },
-      _react2.default.createElement(
-        'form',
-        { id: 'create-project', className: 'bg-gray' },
+  function ProjectForm(props) {
+    _classCallCheck(this, ProjectForm);
+
+    var _this = _possibleConstructorReturn(this, (ProjectForm.__proto__ || Object.getPrototypeOf(ProjectForm)).call(this, props));
+
+    _this.state = {
+      name: '',
+      color: ''
+    };
+
+    _this.handleInputChange = _this.handleInputChange.bind(_this);
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    return _this;
+  }
+
+  _createClass(ProjectForm, [{
+    key: 'handleInputChange',
+    value: function handleInputChange(event) {
+      var target = event.target;
+      var value = target.type === 'checkbox' ? target.checked : target.value;
+      var name = target.name;
+
+      this.setState(_defineProperty({}, name, value));
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(event) {
+      var data = { "name": this.state.name, "color": this.state.color };
+      _api2.default.createProject(data);
+      event.preventDefault();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'span',
+        null,
         _react2.default.createElement(
-          'div',
-          { className: 'input-group' },
-          _react2.default.createElement('input', { type: 'text', name: 'name', className: 'form-control', placeholder: 'Project Name' }),
-          _react2.default.createElement(
-            'span',
-            { className: 'input-group-btn' },
-            _react2.default.createElement('input', { type: 'color', name: 'color', defaultValue: '#ff0000' })
-          )
+          'a',
+          { href: '#', id: 'perm1', onClick: swap.bind(this, '#perm1', '#temp1'), className: 'adding-button' },
+          '+ Add project'
         ),
         _react2.default.createElement(
           'div',
-          { className: 'input-group' },
-          _react2.default.createElement('input', { onClick: request, type: 'button', className: 'btn btn-primary', value: 'Submit' }),
+          { id: 'temp1', className: 'panel adding-panel hidden bg-gray' },
           _react2.default.createElement(
-            'a',
-            { href: '#', onClick: swap.bind(undefined, '#temp1', '#perm1'), className: 'btn btn-link text-muted' },
-            'Close'
+            'form',
+            { onSubmit: this.handleSubmit, className: 'bg-gray' },
+            _react2.default.createElement(
+              'div',
+              { className: 'input-group' },
+              _react2.default.createElement('input', { type: 'text', name: 'name', className: 'form-control', onChange: this.handleInputChange, placeholder: 'Project Name' }),
+              _react2.default.createElement(
+                'span',
+                { className: 'input-group-btn' },
+                _react2.default.createElement('input', { type: 'color', name: 'color', defaultValue: '#ff0000', onChange: this.handleInputChange })
+              )
+            ),
+            _react2.default.createElement(
+              'div',
+              { className: 'input-group' },
+              _react2.default.createElement('input', { type: 'submit', className: 'btn btn-primary', value: 'Submit' }),
+              _react2.default.createElement(
+                'a',
+                { href: '#', onClick: swap.bind(this, '#temp1', '#perm1'), className: 'btn btn-link text-muted' },
+                'Close'
+              )
+            )
           )
         )
-      )
-    )
-  );
-};
+      );
+    }
+  }]);
+
+  return ProjectForm;
+}(_react2.default.Component);
 
 exports.default = ProjectForm;
 
@@ -34990,6 +35070,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -35000,27 +35082,68 @@ var _api2 = _interopRequireDefault(_api);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function request() {
-  var form = document.getElementById("signin");
-  var data = { "username": form.username.value, "password": form.password.value };
-  _api2.default.signIn(data);
-  form.reset();
-}
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var SignIn = function SignIn(props) {
-  return _react2.default.createElement(
-    'form',
-    { id: 'signin' },
-    _react2.default.createElement(
-      'h3',
-      null,
-      'Sign In'
-    ),
-    _react2.default.createElement('input', { type: 'text', className: 'form-control', name: 'username', placeholder: 'Username' }),
-    _react2.default.createElement('input', { type: 'password', className: 'form-control', name: 'password', placeholder: 'Password' }),
-    _react2.default.createElement('input', { onClick: request, type: 'button', className: 'btn btn-primary', value: 'Sign In' })
-  );
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SignIn = function (_React$Component) {
+  _inherits(SignIn, _React$Component);
+
+  function SignIn(props) {
+    _classCallCheck(this, SignIn);
+
+    var _this = _possibleConstructorReturn(this, (SignIn.__proto__ || Object.getPrototypeOf(SignIn)).call(this, props));
+
+    _this.state = {
+      username: '',
+      password: ''
+    };
+
+    _this.handleInputChange = _this.handleInputChange.bind(_this);
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    return _this;
+  }
+
+  _createClass(SignIn, [{
+    key: 'handleInputChange',
+    value: function handleInputChange(event) {
+      var target = event.target;
+      var value = target.type === 'checkbox' ? target.checked : target.value;
+      var name = target.name;
+
+      this.setState(_defineProperty({}, name, value));
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(event) {
+      var data = { "username": this.state.username, "password": this.state.password };
+      _api2.default.signIn(data);
+      event.preventDefault();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'form',
+        { onSubmit: this.handleSubmit },
+        _react2.default.createElement(
+          'h3',
+          null,
+          'Sign In'
+        ),
+        _react2.default.createElement('input', { type: 'text', className: 'form-control', name: 'username', onChange: this.handleInputChange, placeholder: 'Username' }),
+        _react2.default.createElement('input', { type: 'password', className: 'form-control', name: 'password', onChange: this.handleInputChange, placeholder: 'Password' }),
+        _react2.default.createElement('input', { type: 'submit', className: 'btn btn-primary', value: 'Sign In' })
+      );
+    }
+  }]);
+
+  return SignIn;
+}(_react2.default.Component);
 
 exports.default = SignIn;
 
@@ -35031,6 +35154,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -35041,31 +35166,68 @@ var _api2 = _interopRequireDefault(_api);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function request() {
-  var form = document.getElementById("signup");
-  var data = { "username": form.username.value, "password": form.password.value };
-  _api2.default.signUp(data);
-  form.reset();
-}
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var SignUp = function SignUp(props) {
-  return _react2.default.createElement(
-    'form',
-    { id: 'signup' },
-    _react2.default.createElement(
-      'h3',
-      null,
-      'Sign Up'
-    ),
-    _react2.default.createElement('input', { type: 'text', className: 'form-control', name: 'username', placeholder: 'Username' }),
-    _react2.default.createElement('input', { type: 'password', className: 'form-control', name: 'password', placeholder: 'Password' }),
-    _react2.default.createElement(
-      'button',
-      { type: 'submit', className: 'btn btn-primary' },
-      'Sign Up'
-    )
-  );
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SignUp = function (_React$Component) {
+  _inherits(SignUp, _React$Component);
+
+  function SignUp(props) {
+    _classCallCheck(this, SignUp);
+
+    var _this = _possibleConstructorReturn(this, (SignUp.__proto__ || Object.getPrototypeOf(SignUp)).call(this, props));
+
+    _this.state = {
+      username: '',
+      password: ''
+    };
+
+    _this.handleInputChange = _this.handleInputChange.bind(_this);
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    return _this;
+  }
+
+  _createClass(SignUp, [{
+    key: 'handleInputChange',
+    value: function handleInputChange(event) {
+      var target = event.target;
+      var value = target.type === 'checkbox' ? target.checked : target.value;
+      var name = target.name;
+
+      this.setState(_defineProperty({}, name, value));
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(event) {
+      var data = { "username": this.state.username, "password": this.state.password };
+      _api2.default.signUp(data);
+      event.preventDefault();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'form',
+        { onSubmit: this.handleSubmit },
+        _react2.default.createElement(
+          'h3',
+          null,
+          'Sign Up'
+        ),
+        _react2.default.createElement('input', { type: 'text', className: 'form-control', name: 'username', onChange: this.handleInputChange, placeholder: 'Username' }),
+        _react2.default.createElement('input', { type: 'password', className: 'form-control', name: 'password', onChange: this.handleInputChange, placeholder: 'Password' }),
+        _react2.default.createElement('input', { type: 'submit', className: 'btn btn-primary', value: 'Sign Up' })
+      );
+    }
+  }]);
+
+  return SignUp;
+}(_react2.default.Component);
 
 exports.default = SignUp;
 
@@ -35108,6 +35270,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -35116,89 +35280,158 @@ var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
+var _api = require('../tasks/api');
+
+var _api2 = _interopRequireDefault(_api);
+
+var _store = require('../menu/store');
+
+var _store2 = _interopRequireDefault(_store);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function swap(elToDeactivate, elToActivate) {
   (0, _jquery2.default)(elToDeactivate).addClass('hidden');
   (0, _jquery2.default)(elToActivate).removeClass('hidden');
 }
 
-var Taskform = function Taskform(props) {
-  var list = props.projects.map(function (project) {
-    return _react2.default.createElement(
-      'option',
-      { value: project.id },
-      project.name
-    );
-  });
-  return _react2.default.createElement(
-    'span',
-    null,
-    _react2.default.createElement(
-      'a',
-      { href: '#', id: 'perm2', onClick: swap.bind(undefined, '#perm2', '#temp2'), className: 'adding-button' },
-      '+ Add task'
-    ),
-    _react2.default.createElement(
-      'div',
-      { id: 'temp2', className: 'panel hidden' },
-      _react2.default.createElement(
-        'a',
-        { href: '#', onClick: swap.bind(undefined, '#temp2', '#perm2') },
-        '- Close'
-      ),
-      _react2.default.createElement(
-        'form',
+var Taskform = function (_React$Component) {
+  _inherits(Taskform, _React$Component);
+
+  function Taskform(props) {
+    _classCallCheck(this, Taskform);
+
+    var _this = _possibleConstructorReturn(this, (Taskform.__proto__ || Object.getPrototypeOf(Taskform)).call(this, props));
+
+    _this.state = {
+      projects: props.projects,
+      name: '',
+      date: '',
+      project_id: 0,
+      priority: 1
+    };
+
+    _this.handleInputChange = _this.handleInputChange.bind(_this);
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    return _this;
+  }
+
+  _createClass(Taskform, [{
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(props) {
+      var list = props.projects.map(function (project) {
+        return _react2.default.createElement(
+          'option',
+          { value: project.id },
+          project.name
+        );
+      });
+      this.setState({
+        projects: list,
+        project_id: props.projects[0].id
+      });
+    }
+  }, {
+    key: 'handleInputChange',
+    value: function handleInputChange(event) {
+      var target = event.target;
+      var value = target.type === 'checkbox' ? target.checked : target.value;
+      var name = target.name;
+
+      this.setState(_defineProperty({}, name, value));
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(event) {
+      var data = {
+        "name": this.state.name,
+        "date": this.state.date,
+        "priority": this.state.priority,
+        "project": this.state.project_id
+      };
+      _api2.default.createTask(data);
+      event.preventDefault();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'span',
         null,
         _react2.default.createElement(
-          'div',
-          { className: 'input-group' },
-          _react2.default.createElement('input', { type: 'text', name: 'name', className: 'form-control', placeholder: 'Task Name' }),
-          _react2.default.createElement(
-            'span',
-            { className: 'input-group-btn' },
-            _react2.default.createElement('input', { type: 'date', name: 'date', className: 'form-control' })
-          )
+          'a',
+          { href: '#', id: 'perm2', onClick: swap.bind(this, '#perm2', '#temp2'), className: 'adding-button' },
+          '+ Add task'
         ),
         _react2.default.createElement(
           'div',
-          { className: 'input-group pull-right' },
-          _react2.default.createElement('select', { className: 'btn btn-default dropdown-toggle', name: 'project_id',
-            'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',
-            children: list }),
+          { id: 'temp2', className: 'panel hidden' },
           _react2.default.createElement(
-            'select',
-            { className: 'btn btn-default dropdown-toggle', name: 'priority', 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false' },
+            'a',
+            { href: '#', onClick: swap.bind(this, '#temp2', '#perm2') },
+            '- Close'
+          ),
+          _react2.default.createElement(
+            'form',
+            { onSubmit: this.handleSubmit },
             _react2.default.createElement(
-              'option',
-              { value: '1' },
-              'High'
+              'div',
+              { className: 'input-group' },
+              _react2.default.createElement('input', { type: 'text', name: 'name', className: 'form-control', onChange: this.handleInputChange, placeholder: 'Task Name' }),
+              _react2.default.createElement(
+                'span',
+                { className: 'input-group-btn' },
+                _react2.default.createElement('input', { type: 'date', name: 'date', className: 'form-control', onChange: this.handleInputChange })
+              )
             ),
             _react2.default.createElement(
-              'option',
-              { value: '2' },
-              'Medium'
+              'div',
+              { className: 'input-group pull-right' },
+              _react2.default.createElement('select', { className: 'btn btn-default dropdown-toggle', name: 'project_id',
+                'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false',
+                children: this.state.projects, onChange: this.handleInputChange, value: this.state.project_id }),
+              _react2.default.createElement(
+                'select',
+                { className: 'btn btn-default dropdown-toggle', name: 'priority',
+                  onChange: this.handleInputChange, 'data-toggle': 'dropdown', 'aria-haspopup': 'true', 'aria-expanded': 'false' },
+                _react2.default.createElement(
+                  'option',
+                  { value: '1' },
+                  'High'
+                ),
+                _react2.default.createElement(
+                  'option',
+                  { value: '2' },
+                  'Medium'
+                ),
+                _react2.default.createElement(
+                  'option',
+                  { value: '3' },
+                  'Low'
+                )
+              )
             ),
-            _react2.default.createElement(
-              'option',
-              { value: '3' },
-              'Low'
-            )
+            _react2.default.createElement('input', { type: 'submit', className: 'btn btn-primary', value: 'Submit' })
           )
-        ),
-        _react2.default.createElement(
-          'button',
-          { type: 'submit', className: 'btn btn-primary' },
-          'Submit'
         )
-      )
-    )
-  );
-};
+      );
+    }
+  }]);
+
+  return Taskform;
+}(_react2.default.Component);
 
 exports.default = Taskform;
 
-},{"jquery":35,"react":215}],232:[function(require,module,exports){
+},{"../menu/store":238,"../tasks/api":241,"jquery":35,"react":215}],232:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -35282,6 +35515,7 @@ var UNAUTHORIZE = exports.UNAUTHORIZE = 'unauthorized';
 var GET_PROJECTS = exports.GET_PROJECTS = 'get-projects';
 var PROJECTS_CHANGED = exports.PROJECTS_CHANGED = 'projects-changed';
 var GET_TASKS = exports.GET_TASKS = 'get-tasks';
+var TASKS_CHANGED = exports.TASKS_CHANGED = 'tasks-changed';
 
 },{}],235:[function(require,module,exports){
 'use strict';
@@ -35388,7 +35622,11 @@ var Menu = function (_React$Component) {
             _api4.default.getTasks(request);
           } });
       });
-      list.push(_react2.default.createElement(_projectform2.default, null));
+      list.push(_react2.default.createElement(
+        'li',
+        { role: 'presentation' },
+        _react2.default.createElement(_projectform2.default, null)
+      ));
       return list;
     }
   }, {
@@ -35690,6 +35928,7 @@ var Tasks = function (_React$Component) {
     };
     _this.onGetTasks = _this.onGetTasks.bind(_this);
     _this.onGetProjects = _this.onGetProjects.bind(_this);
+    _this.onChanged = _this.onChanged.bind(_this);
     return _this;
   }
 
@@ -35697,12 +35936,14 @@ var Tasks = function (_React$Component) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       _store2.default.addEventListener(_constants.GET_TASKS, this.onGetTasks);
+      _store2.default.addEventListener(_constants.TASKS_CHANGED, this.onChanged);
       _store4.default.addEventListener(_constants.GET_PROJECTS, this.onGetProjects);
     }
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
       _store2.default.removeEventListener(_constants.GET_TASKS, this.onGetTasks);
+      _store2.default.addEventListener(_constants.TASKS_CHANGED, this.onChanged);
       _store4.default.removeEventListener(_constants.GET_PROJECTS, this.onGetProjects);
     }
   }, {
@@ -35712,6 +35953,17 @@ var Tasks = function (_React$Component) {
         header: _store2.default.getHeader(),
         tasks: _store2.default.getTasks()
       });
+    }
+  }, {
+    key: 'onChanged',
+    value: function onChanged() {
+      var project_id = _store2.default.getProject();
+      var project = this.state.projects.filter(function (project) {
+        return project.id == project_id;
+      })[0];
+      console.log(project);
+      _store2.default.setHeader(project.name);
+      _api2.default.getTasks("project_id=" + project_id);
     }
   }, {
     key: 'onGetProjects',
@@ -35730,7 +35982,7 @@ var Tasks = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      var element = "";
+      var elements = "";
       if (this.state.tasks.length > 0) {
         var sortedTasks = this.state.tasks.sort(function (a, b) {
           return a.priority - b.priority;
@@ -35738,9 +35990,9 @@ var Tasks = function (_React$Component) {
         var list = sortedTasks.map(function (task) {
           return _this2.renderTask.call(_this2, task);
         });
-        element = _react2.default.createElement('ul', { className: 'list-group', children: list });
+        elements = _react2.default.createElement('ul', { className: 'list-group', children: list });
       } else {
-        element = _react2.default.createElement(
+        elements = _react2.default.createElement(
           'div',
           { className: 'alert alert-info', role: 'alert' },
           'Choose one of your projects or date to see the TODO list.'
@@ -35754,7 +36006,7 @@ var Tasks = function (_React$Component) {
           null,
           this.state.header
         ),
-        element,
+        elements,
         _react2.default.createElement(_taskform2.default, { projects: this.state.projects })
       );
     }
@@ -35797,10 +36049,13 @@ var TasksActions = function () {
         data: tasks
       });
     }
-  }], [{
-    key: "GET_TASKS",
-    get: function get() {
-      return _constants.GET_TASKS;
+  }, {
+    key: "changed",
+    value: function changed(project) {
+      _appDispatcher2.default.dispatch({
+        eventName: _constants.TASKS_CHANGED,
+        data: project
+      });
     }
   }]);
 
@@ -35857,6 +36112,25 @@ var TasksApi = function () {
         }
       });
     }
+  }, {
+    key: "createTask",
+    value: function createTask(taskData) {
+      (0, _ajaxwrapper2.default)({
+        type: "POST",
+        url: serverURL + "/api/task",
+        data: JSON.stringify(taskData),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: function beforeSend(xhr) {
+          xhr.setRequestHeader("Accept", "application/json");
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader("Authorization", "JWT " + sessionStorage["access_token"]);
+        },
+        success: function success(data) {
+          _actions2.default.changed(taskData.project);
+        }
+      });
+    }
   }]);
 
   return TasksApi;
@@ -35901,6 +36175,7 @@ var TasksStore = function (_EventEmiter) {
 
     _this.tasks = [];
     _this.header = "";
+    _this.project_id = null;
     return _this;
   }
 
@@ -35934,6 +36209,16 @@ var TasksStore = function (_EventEmiter) {
     value: function getHeader() {
       return this.header;
     }
+  }, {
+    key: "setProject",
+    value: function setProject(project_id) {
+      this.project_id = project_id;
+    }
+  }, {
+    key: "getProject",
+    value: function getProject() {
+      return this.project_id;
+    }
   }]);
 
   return TasksStore;
@@ -35945,6 +36230,10 @@ instanseTasksStore.dispatchTocken = _appDispatcher2.default.register(function (a
   switch (action.eventName) {
     case _constants.GET_TASKS:
       instanseTasksStore.setTasks(action.data);
+      instanseTasksStore.emit(action.eventName);
+      return false;
+    case _constants.TASKS_CHANGED:
+      instanseTasksStore.setProject(action.data);
       instanseTasksStore.emit(action.eventName);
       return false;
     default:
